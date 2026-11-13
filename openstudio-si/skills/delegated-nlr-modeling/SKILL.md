@@ -1,0 +1,139 @@
+---
+name: delegated-nlr-modeling
+description: Use NLR OpenStudio-MCP as the preferred exclusive energy-modeling provider while OpenStudio SI owns workflow state, artifacts, and learning.
+---
+
+# Delegated NLR Modeling Workflow
+
+Use this skill when NLR is configured as `openstudio-mcp` and passes preflight. NLR is
+the preferred provider for model creation, model edits, measures, simulation,
+and result retrieval. OpenStudio SI remains mandatory for blackboard state,
+artifact provenance, provider decisions, and learning capture.
+
+If NLR is not configured, unavailable, incompatible, or rejected by preflight,
+do not attempt NLR operations. Record the reason in the OpenStudio SI
+blackboard and use the normal OpenStudio SI-only skill route.
+
+## Mandatory Start
+
+1. Load this skill before calling any NLR tool, including status and version
+   calls. Use the tools exposed by the configured `openstudio-mcp` connection.
+2. Call `blackboard_initialize_workflow` and record `execution_provider` as
+   `nlr_openstudio` (the stable provider identifier, not the connection name).
+   Also record the actual connection name, the NLR endpoint/image identity when
+   available, and the configured host/container workspace mapping.
+3. Call NLR `get_server_status` and `get_versions`. Record the result before
+   model work. Check the OpenStudio and EnergyPlus versions against the model
+   and project requirements.
+4. Treat `/inputs`, `/runs`, and `/measures` as NLR provider paths. Record the
+   corresponding host-visible paths as artifacts. Never use a provider path in
+   a host shell command or host-side SDK script.
+
+Do not make more than one critical NLR mutation without an intervening
+blackboard write. Critical boundaries include model creation/load/save, measure
+creation/application, simulation submission/completion, results extraction,
+provider transition, and final handoff.
+
+## NLR Mount-Access Recovery
+
+Before loading, copying, or submitting a host model to NLR, compare its
+absolute host path with the recorded host folder mapped to `/inputs`. Docker
+and NLR's sandbox permit access only below the configured mounts; an active
+chat or project directory is not automatically shared with the container.
+
+If the model is outside that input mount, or NLR reports that it cannot upload
+or transfer a model to its local simulation server:
+
+1. Do not retry the transfer or diagnose this first as a `localhost` networking
+   failure. State that the model is outside NLR's Docker mount scope unless
+   evidence shows otherwise.
+2. Offer the user two narrow remedies: stage/copy the model in the existing
+   mounted input folder and use `/inputs/<filename>`, or reconfigure NLR to use
+   a dedicated workspace for the current project.
+3. For standalone Claude Desktop, explain that the MCP configuration is global:
+   **Settings → Developer → Edit Config** opens `claude_desktop_config.json`.
+   The user must change all three `-v` host paths for `inputs`, `runs`, and
+   `measures` to the selected workspace, retain the supported server name
+   `openstudio-mcp`, then quit and reopen Claude Desktop and start a new chat.
+4. Do not edit the user's global Claude Desktop configuration yourself, mount a
+   home directory, expose credentials, or add the Docker socket to work around
+   the boundary. Wait for the user to choose a workspace and complete the
+   reconfiguration.
+
+After the new server connection is available, record the replacement
+host/container mapping in the blackboard and resume from the staged model. See
+`docs/CLAUDE_DESKTOP_NLR_OPENSTUDIO_MCP.md` in the source distribution for the
+complete configuration example and troubleshooting table.
+
+## NLR Skill Guidance
+
+NLR's user-facing skills are retrieved from its MCP server; they are not
+automatically native Claude Code or Codex skills. Before a non-trivial NLR task,
+call NLR `list_skills` and retrieve only the task-relevant guide with
+`get_skill`. Record the NLR skill name and version/source in the blackboard.
+
+Use the retrieved NLR guide as provider-specific procedure. The OpenStudio SI
+plugin remains the parent orchestrator and retains ownership of blackboard,
+artifact, and learning calls. Do not bulk-load or blindly reproduce NLR skill
+content.
+
+For an NLR custom measure, the required sequence is:
+
+```text
+get_skill("measure-authoring")
+→ search_api for each non-trivial OpenStudio class/method
+→ create_measure
+→ test_measure on a representative model
+→ apply_measure
+→ inspect and record the changed model
+```
+
+NLR `search_api` verifies methods against its live bindings, but does not
+replace engineering review, unit checks, or before/after validation.
+
+## NLR Execution And Blackboard Records
+
+- Use only NLR tools for the selected modeling phase. Do not call OpenStudio SI
+  `model_*`, `sim_*`, `results_*`, or measure tools against the same unstaged
+  model.
+- After each NLR action, call the relevant blackboard operation: record the
+  model/run/result artifact, update state, mark the completed phase, or record
+  the failure before retrying.
+- Every artifact record must include provider, NLR run ID when available,
+  `container_path`, `host_path`, source model, content hash when available,
+  and warnings/log locations.
+- Snapshot the workflow before a conversation pause and at final handoff.
+
+## SDK Fallback Boundary
+
+Switch to the OpenStudio SI SDK route only when the model has evidence that NLR
+cannot express the requested operation after consulting the relevant NLR skill
+and capability/API lookup. Record the unsupported operation, NLR evidence,
+reason for the transition, input model artifact, and selected local SDK in
+the blackboard before local SDK execution.
+
+Export or copy the NLR model to its recorded host-visible staging path first.
+For the demo topology, a provider path `/runs/<suffix>` maps to
+`./nlr-workspace/runs/<suffix>` from the demo repository root. `/runs` is never
+valid in host-side source code. Choose a specific energy-modeling skill first:
+supported VAV creation uses `openstudio-vav-reheat-system-creator` and its bundled
+doctor/preflight/apply workflow. This local bundle executes through host tools,
+without the OpenStudio SI modeling runtime. Only when no specific skill covers
+the request, load `openstudio-sdk-model-editor` and its bespoke-edit reference,
+retrieve the required API documentation and draft scoped code. In either route,
+verify the exact local OpenStudio release recorded in the package compatibility contract and
+write a new output model rather than overwriting the delegated artifact.
+
+The SDK edit is a new provider phase. After it completes, validate and record
+the output. A later simulation may use OpenStudio SI or may be explicitly
+handed back to NLR through a recorded staging/import boundary; never allow both
+providers to mutate the same unstaged model.
+
+## Learning And Handoff
+
+Capture NLR capability gaps, failures, and successful patterns as candidate
+learning evidence through OpenStudio SI. Do not promote NLR guidance, generated
+measure code, or runtime observations into trusted plugin assets without review.
+At handoff, record the provider history, final model, run IDs, artifacts,
+results, assumptions, warnings, failures, and next recommended action; mark
+the workflow complete and snapshot it.
