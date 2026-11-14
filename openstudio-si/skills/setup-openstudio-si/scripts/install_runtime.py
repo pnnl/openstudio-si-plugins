@@ -1,0 +1,129 @@
+"""Install or repair the OpenStudio SI runtime package for this plugin."""
+
+from __future__ import annotations
+
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
+DEFAULT_PACKAGE_SPEC = "openstudio-si==0.4.2"
+
+
+def run(command: list[str]) -> int:
+    print(f"\n$ {' '.join(command)}")
+    completed = subprocess.run(command, check=False)
+    return completed.returncode
+
+
+def runtime_command_path(command: str) -> str | None:
+    """Find a console script for this interpreter after pip install."""
+    scripts_dir = Path(sys.prefix) / ("Scripts" if os.name == "nt" else "bin")
+    candidates = [scripts_dir / command]
+    if os.name == "nt":
+        candidates.append(scripts_dir / f"{command}.exe")
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return None if sys.prefix != sys.base_prefix else shutil.which(command)
+
+
+def runtime_cli_path() -> str | None:
+    """Find the openstudio-si console script for this interpreter."""
+    return runtime_command_path("openstudio-si")
+
+
+def is_pipx_managed_runtime() -> bool:
+    """Return whether the active OpenStudio SI command belongs to a pipx venv."""
+    if sys.prefix != sys.base_prefix:
+        return False
+    command = shutil.which("openstudio-si")
+    if command is None or shutil.which("pipx") is None:
+        return False
+    resolved = Path(command).resolve()
+    return "pipx" in resolved.parts and "venvs" in resolved.parts
+
+
+def main() -> int:
+    print("OpenStudio SI runtime installer")
+    print("===============================")
+    print(f"Python executable: {sys.executable}")
+    print(f"Python version: {sys.version.split()[0]}")
+
+    if sys.version_info < (3, 10):
+        print(
+            "\nOpenStudio SI requires Python 3.10 or newer. Install a supported "
+            "Python version, then rerun setup."
+        )
+        return 2
+
+    package_spec = os.getenv("OPENSTUDIO_SI_PACKAGE_SPEC", DEFAULT_PACKAGE_SPEC)
+    if shutil.which("openstudio-si") and shutil.which("openstudio-si-mcp"):
+        print("\nOpenStudio SI commands are available. Checking for a compatible runtime update.")
+    else:
+        print("\nOpenStudio SI runtime is not installed yet.")
+    print(f"Installing or upgrading runtime package: {package_spec}")
+    print(
+        "Set OPENSTUDIO_SI_PACKAGE_SPEC to a wheel path, internal index spec, "
+        "or pinned version if your organization does not install from PyPI."
+    )
+    if is_pipx_managed_runtime() and package_spec == DEFAULT_PACKAGE_SPEC:
+        print(
+            "The active runtime is managed by pipx; upgrading that environment "
+            "so the MCP command used by the host is updated."
+        )
+        code = run(["pipx", "upgrade", "--install", "openstudio-si"])
+    elif is_pipx_managed_runtime():
+        print(
+            "\nThe active runtime is managed by pipx and a custom package specification "
+            "was requested. Update that pipx environment with your approved package, then "
+            "rerun doctor."
+        )
+        return 2
+    else:
+        code = run([sys.executable, "-m", "pip", "install", "--upgrade", package_spec])
+    if code != 0:
+        print(
+            "\nRuntime package installation failed. Check Python permissions, "
+            "network access, package index access, or ask your support contact "
+            "for an approved OpenStudio SI package."
+        )
+        return code
+
+    runtime_cli = runtime_cli_path()
+    if runtime_cli is None:
+        print("\nInstalled package, but the openstudio-si command was not found for this Python environment.")
+        return 3
+    code = run([runtime_cli, "install-runtime"])
+    if code != 0:
+        print("\nInstalled package, but runtime initialization failed.")
+        return code
+
+    runtime_mcp = runtime_command_path("openstudio-si-mcp")
+    if not shutil.which("openstudio-si-mcp"):
+        print(
+            "\nThe package installed, but openstudio-si-mcp is not on PATH in this shell."
+        )
+        if runtime_mcp:
+            print(f"Installed MCP command: {runtime_mcp}")
+            print(
+                "Add its parent directory to the PATH used to launch the SI tool, then restart "
+                "or reconnect the plugin. Keep marketplace .mcp.json configured with the "
+                "portable command `openstudio-si-mcp`; do not replace it with this absolute path."
+            )
+        else:
+            print(
+                "The MCP command was not found beside this Python interpreter. Reinstall the "
+                "runtime with this same Python, then rerun doctor."
+            )
+        return 3
+
+    print("\nOpenStudio SI runtime installation completed.")
+    print("\nAfter the update, run /reload-plugins or reconnect the MCP server so Claude Code starts openstudio-si-mcp again and discovers any newly added tools.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

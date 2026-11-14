@@ -1,14 +1,14 @@
 {
-  "name": "openstudio-ai-local",
+  "name": "openstudio-si-local",
   "interface": {
-    "displayName": "OpenStudio AI Local"
+    "displayName": "OpenStudio SI Local"
   },
   "plugins": [
     {
-      "name": "openstudio-ai",
+      "name": "openstudio-si",
       "source": {
         "source": "local",
-        "path": "./plugins/openstudio-ai"
+        "path": "./plugins/openstudio-si"
       },
       "policy": {
         "installation": "AVAILABLE",

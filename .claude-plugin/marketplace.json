@@ -1,17 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "openstudio-ai-local",
-  "version": "0.4.1",
-  "description": "Local marketplace for the OpenStudio AI Claude plugin.",
+  "name": "openstudio-si-local",
+  "version": "0.4.2",
+  "description": "Local marketplace for the OpenStudio SI Claude plugin.",
   "owner": {
-    "name": "OpenStudio AI"
+    "name": "OpenStudio SI"
   },
   "plugins": [
     {
-      "name": "openstudio-ai",
-      "description": "OpenStudio AI harness for OpenStudio model editing, simulation, results, SDK lookup, and reusable workflow skills.",
-      "version": "0.4.1",
-      "source": "./openstudio-ai",
+      "name": "openstudio-si",
+      "description": "OpenStudio SI harness for OpenStudio model editing, simulation, results, SDK lookup, and reusable workflow skills.",
+      "version": "0.4.2",
+      "source": "./openstudio-si",
       "category": "engineering"
     }
   ]
