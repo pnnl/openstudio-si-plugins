@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generator": "openstudio-ai export marketplace",
+  "generator": "openstudio-si export marketplace",
   "package": {
-    "name": "openstudio-ai",
-    "version": "0.4.1"
+    "name": "openstudio-si",
+    "version": "0.4.2"
   },
   "plugin": {
-    "name": "openstudio-ai",
+    "name": "openstudio-si",
     "mcp_interface_contract_version": "6.0",
     "runtime_mode": "marketplace"
   },
   "source": {
-    "revision": "0f0b03a8b7cfde58593eff19e9f99275eba85879",
+    "revision": "ac6bfaf2e113887536f40d21c038b15b55b545a7",
     "dirty": null
   }
 }

@@ -1,0 +1,15 @@
+{
+  "name": "openstudio-si",
+  "displayName": "OpenStudio SI",
+  "version": "0.4.2",
+  "description": "OpenStudio SI harness for model editing, simulation, results, SDK lookup, and reusable building-energy workflow skills.",
+  "author": {
+    "name": "OpenStudio SI"
+  },
+  "keywords": [
+    "openstudio",
+    "building-energy-modeling",
+    "mcp",
+    "simulation"
+  ]
+}

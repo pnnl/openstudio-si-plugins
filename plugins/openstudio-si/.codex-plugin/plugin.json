@@ -1,0 +1,37 @@
+{
+  "name": "openstudio-si",
+  "version": "0.4.2",
+  "description": "OpenStudio SI harness for OpenStudio model editing, simulation, results, SDK lookup, and reusable workflow skills.",
+  "author": {
+    "name": "OpenStudio SI"
+  },
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "openstudio",
+    "building-energy-modeling",
+    "mcp",
+    "simulation"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "OpenStudio SI",
+    "shortDescription": "OpenStudio modeling, simulation, SDK lookup, and workflow skills.",
+    "longDescription": "OpenStudio SI packages MCP tools, reusable skills, reviewed knowledge, and blackboard contracts for building-energy modeling workflows.",
+    "developerName": "OpenStudio SI",
+    "category": "Engineering",
+    "capabilities": [
+      "MCP",
+      "Skills",
+      "Workflow Automation"
+    ],
+    "defaultPrompt": [
+      "Inspect this OpenStudio model.",
+      "Add a VAV reheat system.",
+      "Run simulation and summarize results."
+    ],
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/openstudio-si-icon.png",
+    "logo": "./assets/openstudio-si-icon.png"
+  }
+}
