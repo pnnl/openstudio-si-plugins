@@ -1,11 +1,11 @@
-window.OPENSTUDIO_AI_LATEST_RELEASE = {
-  "version": "0.4.1",
-  "url": "https://github.com/pnnl/openstudio-ai-plugins/releases/tag/v0.4.1",
-  "summary": "See the release notes for changes and upgrade guidance."
+window.OPENSTUDIO_SI_LATEST_RELEASE = {
+  "version": "0.4.2",
+  "url": "https://github.com/pnnl/openstudio-si-harness/releases/tag/v0.4.2",
+  "summary": "See the release notes for changes and installation guidance."
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const release = window.OPENSTUDIO_AI_LATEST_RELEASE;
+  const release = window.OPENSTUDIO_SI_LATEST_RELEASE;
   if (!release || !release.version || !release.url) return;
 
   document.querySelectorAll("[data-release-banner]").forEach((banner) => {
@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
     label.textContent = "Latest release";
 
     const version = document.createElement("strong");
-    version.textContent = `OpenStudio AI ${release.version}`;
+    version.textContent = `OpenStudio SI ${release.version}`;
 
     const summary = document.createElement("span");
     summary.className = "release-summary";
-    summary.textContent = release.summary || "See the release notes for changes and upgrade guidance.";
+    summary.textContent = release.summary || "See the release notes for changes and installation guidance.";
 
     const link = document.createElement("a");
     link.href = release.url;

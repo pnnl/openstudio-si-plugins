@@ -30,11 +30,11 @@ jobs:
             const data = {
               version: release.tag_name.replace(/^v/, ""),
               url: release.html_url,
-              summary: "See the release notes for changes and upgrade guidance."
+              summary: "See the release notes for changes and installation guidance."
             };
-            const content = `window.OPENSTUDIO_AI_LATEST_RELEASE = ${JSON.stringify(data, null, 2)};\n\n` +
+            const content = `window.OPENSTUDIO_SI_LATEST_RELEASE = ${JSON.stringify(data, null, 2)};\n\n` +
               `document.addEventListener("DOMContentLoaded", () => {\n` +
-              `  const release = window.OPENSTUDIO_AI_LATEST_RELEASE;\n` +
+              `  const release = window.OPENSTUDIO_SI_LATEST_RELEASE;\n` +
               `  if (!release || !release.version || !release.url) return;\n\n` +
               `  document.querySelectorAll("[data-release-banner]").forEach((banner) => {\n` +
               `    const wrap = document.createElement("div");\n` +
@@ -43,10 +43,10 @@ jobs:
               `    label.className = "release-label";\n` +
               `    label.textContent = "Latest release";\n\n` +
               `    const version = document.createElement("strong");\n` +
-              `    version.textContent = \`OpenStudio AI \${release.version}\`;\n\n` +
+              `    version.textContent = \`OpenStudio SI \${release.version}\`;\n\n` +
               `    const summary = document.createElement("span");\n` +
               `    summary.className = "release-summary";\n` +
-              `    summary.textContent = release.summary || "See the release notes for changes and upgrade guidance.";\n\n` +
+              `    summary.textContent = release.summary || "See the release notes for changes and installation guidance.";\n\n` +
               `    const link = document.createElement("a");\n` +
               `    link.href = release.url;\n` +
               `    link.textContent = "Read release notes ↗";\n\n` +
