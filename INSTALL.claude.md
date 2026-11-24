@@ -39,7 +39,6 @@ If Claude Code asks for scope, choose local or project scope for testing.
 Use one of the namespaced skills:
 
 ```text
-/openstudio-si:add-vav-reheat
 /openstudio-si:simulate
 /openstudio-si:query-results
 ```
@@ -58,3 +57,9 @@ The setup skill checks Python, checks `openstudio-si-mcp`, and explains any miss
 
 Bundled SDK commands share the installed plugin's `sdk/` library. Keep the complete plugin together, including `sdk/` and `skills/`; a skill folder alone is not an installable SDK bundle. Run the owning skill's `scripts/doctor.py` with host Python before local SDK modeling. A `plugin_incomplete` result requires restoring the complete plugin from its repository, not installing another Python library. This layout adds no setup dependency or runtime service. Export size evidence is in `sdk/PACKAGING.json`.
 Unexpected execution failures route to `report-openstudio-failure`, which automatically submits allowlisted sanitized diagnostics to https://github.com/pnnl/openstudio-si-harness using existing GitHub CLI authentication. Issues are created under your own authenticated GitHub account. Models, companions and transcripts are excluded. Missing authentication/network retains local drafts. Run its independent `scripts/report_failure.py doctor` for optional reporting readiness and `policy disabled` to disable submission for this project. Reporting never gates modeling, and installation sends no incidents.
+
+## HVAC Modeler
+
+For VAV, packaged VAV, CAV, and equipment workflows, install the `openstudio-si-hvac` plugin alongside OpenStudio SI. Install it with `/plugin install openstudio-si-hvac@openstudio-si-local` and reload.
+Start with `/openstudio-si-hvac:hvac-modeler`. To check availability, ask which OpenStudio SI plugins are ready in your current session.
+When upgrading from 0.4.2, enable HVAC Modeler explicitly. Route older HVAC skill names to the specialist. Resume saved work with the specialist skill and verify the model, plan, and approval before applying.

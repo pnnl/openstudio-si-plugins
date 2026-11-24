@@ -14,42 +14,16 @@ OpenStudio SI is a Claude plugin package for building-energy modeling workflows 
 
 ## User-Facing Skills
 
-- `/openstudio-si:add-vav-reheat`: plan and execute a VAV reheat workflow.
 - `/openstudio-si:simulate`: run or prepare an OpenStudio simulation workflow.
 - `/openstudio-si:query-results`: retrieve SQL-backed simulation results.
 
 ## Runtime Skills
 
-- `add-vav-reheat`
 - `capture-session-lesson`
 - `curate-learning`
 - `delegated-nlr-modeling`
 - `github-issue-submitter`
-- `hvac-sizing-assistant`
-- `openstudio-boiler-performance-editor`
-- `openstudio-cav-system-creator`
-- `openstudio-chiller-performance-editor`
-- `openstudio-coil-replacer`
-- `openstudio-district-capacity-editor`
-- `openstudio-economizer-editor`
-- `openstudio-heat-recovery-editor`
-- `openstudio-hvac-remover`
-- `openstudio-hvac-visualizer`
-- `openstudio-outdoor-air-connector`
-- `openstudio-plant-equipment-replacer`
-- `openstudio-plant-loop-creator`
-- `openstudio-pump-performance-editor`
-- `openstudio-pump-replacer`
 - `openstudio-sdk-model-editor`
-- `openstudio-supply-fan-performance-editor`
-- `openstudio-supply-fan-replacer`
-- `openstudio-terminal-editor`
-- `openstudio-terminal-replacer`
-- `openstudio-tower-performance-editor`
-- `openstudio-vav-reheat-system-creator`
-- `openstudio-ventilation-editor`
-- `openstudio-water-coil-connector`
-- `openstudio-water-coil-editor`
 - `openstudio-workflow-state`
 - `propose-measure`
 - `query-energy-standards`

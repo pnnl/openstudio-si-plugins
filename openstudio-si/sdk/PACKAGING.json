@@ -1,37 +1,37 @@
 {
   "schema_version": 2,
   "scope": "sdk_resources",
-  "bundle_id": "a5262dc4fabc6b9d836be54effdb3bca8a6d3a673efffad2b22f60e1abadbf2d",
-  "baseline_copies": 507,
-  "baseline_bytes": 2916376,
-  "shared_payload_files": 127,
-  "launchers": 99,
-  "resource_bytes_excluding_report": 1037679,
-  "saved_bytes": 1878697,
-  "reduction_fraction": 0.6441888837378993,
+  "bundle_id": "a61b46b236bb99da3c40c7c5f8f1613d86d642502e948f6aa56425857e9f785b",
+  "baseline_copies": 15,
+  "baseline_bytes": 101020,
+  "shared_payload_files": 15,
+  "launchers": 3,
+  "resource_bytes_excluding_report": 106899,
+  "saved_bytes": -5879,
+  "reduction_fraction": -0.058196396753118274,
   "max_bytes": 1114112,
   "categories": {
     "payload": {
-      "files": 85,
-      "bytes": 726466
+      "files": 13,
+      "bytes": 95245
     },
     "launchers": {
-      "files": 99,
-      "bytes": 140117
+      "files": 3,
+      "bytes": 4255
     },
     "references": {
-      "files": 42,
-      "bytes": 157974
+      "files": 2,
+      "bytes": 5775
     },
     "metadata": {
       "files": 1,
-      "bytes": 13122
+      "bytes": 1624
     }
   },
   "plugin_excluding_report": {
-    "files": 302,
-    "total_bytes": 1434081,
-    "unique_content_bytes": 1285086,
-    "duplicate_bytes": 148995
+    "files": 69,
+    "total_bytes": 341691,
+    "unique_content_bytes": 291593,
+    "duplicate_bytes": 50098
   }
 }

@@ -1,0 +1,14 @@
+{
+  "name": "openstudio-si-hvac",
+  "version": "0.2.0",
+  "description": "Create and size VAV reheat, packaged VAV, and prototype CAV systems, inspect HVAC topology, and edit air-side and plant equipment and controls.",
+  "author": {
+    "name": "OpenStudio SI"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "OpenStudio SI HVAC Modeler",
+    "shortDescription": "HVAC system design, sizing, topology, and equipment edits.",
+    "category": "Engineering"
+  }
+}

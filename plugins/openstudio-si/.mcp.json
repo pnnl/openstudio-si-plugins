@@ -7,7 +7,7 @@
         "stdio"
       ],
       "env": {
-        "OPENSTUDIO_SI_PLUGIN_VERSION": "0.4.2",
+        "OPENSTUDIO_SI_PLUGIN_VERSION": "0.5.0",
         "OPENSTUDIO_SI_PLUGIN_CONTRACT_VERSION": "6.0"
       }
     }
