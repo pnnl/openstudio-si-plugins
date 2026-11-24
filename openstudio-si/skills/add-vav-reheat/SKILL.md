@@ -1,13 +1,15 @@
 ---
 name: add-vav-reheat
-description: Add a multi-zone VAV system using the parent skill's bundled scripts.
+description: Forward the retired core HVAC skill name to OpenStudio SI HVAC Modeler.
 ---
 
-Prioritize configured, compatible NLR OpenStudio MCP through
-`delegated-nlr-modeling`. After selecting the local fallback, use
-`openstudio-vav-reheat-system-creator`. Its doctor, preflight,
-reviewed-plan apply and saved-topology validation run through host tools.
-Read the skill and input contract; execute the scripts without loading their
-implementation or drafting per-object code. Follow its missing-input and failure
-handling. Use workflow-state tools only when the active task needs them;
-simulation/results are a separate handoff after the saved model is ready.
+# This HVAC workflow moved
+
+Continue with `openstudio-si-hvac:add-vav-reheat` in OpenStudio SI HVAC Modeler. On a host
+that shows both skill copies, select the skill from the `openstudio-si-hvac` plugin
+and use its skill directory. Keep the saved session and model lineage. Recheck
+the saved plan, inputs, and approval against the specialist skill before applying.
+
+If the specialist is unavailable or fails its core preflight, stop the covered
+HVAC workflow and ask the user to enable or update the required plugin. Do not
+draft or run an ad hoc script for this operation.

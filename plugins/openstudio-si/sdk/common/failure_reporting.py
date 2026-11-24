@@ -56,7 +56,7 @@ SAFE_WORDS = set(
     "automatic disabled claude claude_code codex nlr sdk harness plugin python "
     "Darwin Linux Windows arm64 aarch64 x86_64 AMD64 heating cooling water electric "
     "gas dx chilled_water hot_water constant variable supply demand Autosize "
-    "FixedDryBulb NoEconomizer UA NominalCapacity prototype_vav_v1 "
+    "FixedDryBulb NoEconomizer UA NominalCapacity prototype_vav_v1 prototype_pvav_v1 "
     "input output preserved unpublished published unknown".split()
 )
 SAFE_FLAGS = set(
@@ -326,6 +326,7 @@ SAFE_WORDS.update(
         "inH2O",
         "migrate_plant",
         "prototype_vav_v1",
+        "prototype_pvav_v1",
         "relocate_air",
     ]
 )

@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "scope": "sdk_resources",
+  "bundle_id": "f26fe71ef526de6feeb7df923406e75955ce9fdd5e7f21d6ca377c306c0e47a2",
+  "baseline_copies": 493,
+  "baseline_bytes": 2866755,
+  "shared_payload_files": 127,
+  "launchers": 96,
+  "resource_bytes_excluding_report": 1036372,
+  "saved_bytes": 1830383,
+  "reduction_fraction": 0.6384860233957907,
+  "max_bytes": 1114112,
+  "categories": {
+    "payload": {
+      "files": 85,
+      "bytes": 728131
+    },
+    "launchers": {
+      "files": 96,
+      "bytes": 137125
+    },
+    "references": {
+      "files": 42,
+      "bytes": 157994
+    },
+    "metadata": {
+      "files": 1,
+      "bytes": 13122
+    }
+  },
+  "plugin_excluding_report": {
+    "files": 252,
+    "total_bytes": 1217852,
+    "unique_content_bytes": 1122277,
+    "duplicate_bytes": 95575
+  }
+}

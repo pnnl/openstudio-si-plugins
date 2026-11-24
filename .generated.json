@@ -3,7 +3,7 @@
   "generator": "openstudio-si export marketplace",
   "package": {
     "name": "openstudio-si",
-    "version": "0.4.2"
+    "version": "0.5.0"
   },
   "plugin": {
     "name": "openstudio-si",
@@ -11,7 +11,7 @@
     "runtime_mode": "marketplace"
   },
   "source": {
-    "revision": "ac6bfaf2e113887536f40d21c038b15b55b545a7",
+    "revision": "cc45658dcc94263f6ee20af5c447581edc31d596",
     "dirty": null
   }
 }

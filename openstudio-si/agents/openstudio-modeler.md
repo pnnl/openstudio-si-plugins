@@ -25,160 +25,18 @@ simulation workflows, and explain what changed.
 
 ## Skill Routing
 
-- Use `hvac_sizing_assistant` for deterministic MCP sizing workflows that load
-  or clone a model, optionally apply an approved measure, validate, simulate,
-  retrieve artifacts, query sizing results, and summarize assumptions/results.
-- Use `openstudio_sdk_model_editor` for direct `.osm` inspection or scoped
-  model edits. It routes supported operations to bundled scripts and keeps
-  bespoke script development conditional.
-- Use `openstudio_vav_reheat_system_creator` when the user asks to add, create,
-  prototype, or draft a multi-zone VAV reheat air system. Let that parent skill
-  run its bundled doctor, preflight and transactional apply directly through
-  host tools. No per-object drafts, SDK wiki loading, or modeling MCP setup
-  are required for that local operation. State tools are used when the active
-  task needs them; simulation/results remain a separate handoff.
-- Use `openstudio-cav-system-creator` for prototype CAV creation with constant-
-  volume supply fan and water-reheat VAV terminals. Its parent script shares
-  equipment modules with VAV and owns complete assembly/validation; do not invoke
-  an agent or publish a model for each individual component. Other CAV topology
-  requests need explicit coverage rather than silently substituting this recipe.
-- Use `openstudio-district-capacity-editor` for an existing supply-side
-  DistrictHeatingWater or DistrictCooling nominal thermal capacity: explicit watts
-  or Autosize, preserving schedule, connections and identity. Review the retained
-  capacity-fraction schedule; a capacity limit is not an efficiency saving. Steam,
-  schedule changes and district production/loss modeling require separate coverage.
-- Use `openstudio-tower-performance-editor` for one existing condenser supply-side
-  CoolingTowerVariableSpeed design fan electrical power (watts/Autosize), minimum
-  airflow ratio or free-convection fraction edits. Require explicit performance
-  choices; retain design conditions, unrequested inputs, curves and identity.
-  Low-load controls affect fan cycling/fan-off heat rejection and coupled energy;
-  fan-off does not mean pumps off or guaranteed savings.
-  Review autosized design airflow/airflow-based metrics coupled to fan power,
-  evaporation/make-up water and tower electricity;
-  other tower classes, user-defined thermal models and replacement need coverage.
-- Use `openstudio-plant-equipment-replacer` for a selected hot-water boiler →
-  district heating or air/water-cooled EIR chiller → district cooling conversion.
-  Explicit capacity, fraction schedule and reference policy are required. Keep
-  same-class settings in performance editors. Condenser branch removal is shown
-  separately; the condenser plant remains.
-- Use `openstudio-hvac-remover`'s `remove_unused_plants.py` for explicitly selected
-  unused plant cleanup after fresh inventory. Zero coils alone is insufficient;
-  active demand, shared cross-loop equipment or external references block cleanup.
-  Never infer plant deletion from a coil migration or source conversion.
-- Use `openstudio-chiller-performance-editor` for one existing air- or water-cooled
-  ChillerElectricEIR reference COP, cooling capacity (watts/Autosize) or explicit
-  part-load/unloading edit on a
-  Cooling plant. Preserve curves, unrequested sizing/flow inputs, condenser
-  connections, controls and identities. Review effective plant-sizing readiness
-  for explicit Autosize and its retained evaporator-flow/factor sizing basis;
-  require minimum ≤ optimum ≤ maximum and minimum ≤ unloading ≤ maximum,
-  with optimum/maximum > 0; cycling and false loading affect energy. Review autosized
-  condenser pump/tower changes after sizing; chiller electricity is not plant
-  savings. No inferred standards minimum,
-  curve substitution or class conversion. Heat recovery, thermosiphon and other
-  chiller classes need separate coverage.
-- Use `openstudio-boiler-performance-editor` for explicit nominal thermal capacity
-  or capacity Autosize, minimum/maximum/optimum PLRs, HHV efficiency and
-  on-cycle electric/off-cycle fuel parasitics
-  on a heating-plant BoilerHotWater. Retain identity, fuel, design-flow policy,
-  curves, unrequested PLRs, sizing factor and controls. Explicit PLR choices must
-  satisfy minimum ≤ optimum ≤ maximum, maximum > 0; minimum can force
-  overproduction, and optimum is a dispatch hint. Capacity/PLR changes alter dispatch,
-  PLR/curve/parasitic energy or unmet loads; no inferred matching flow or savings.
-  Steam boilers, fuel conversion and replacement require separate coverage.
-- Use `openstudio-terminal-replacer` for one connected single-duct VAV no-reheat
-  ↔ constant-volume no-reheat terminal class change. Require explicit maximum-flow
-  policy, VAV target minimum fraction and preservation/reheat/reference policies.
-  Review new identity, changed airflow behavior, retained zone branch and sizing;
-  this is not a whole-system VAV/CAV conversion. Reheat and unsupported terminal
-  classes need separate coverage. Same-class VAV controls use the terminal editor.
-  Do not draft substitute scripts for covered terminal replacements.
-- Use `openstudio-terminal-editor` for one existing connected single-duct VAV
-  reheat/no-reheat terminal's explicit Constant-method minimum fraction or applicable
-  reheat controls, including terminals in prototype CAV systems. Preserve the
-  terminal/coil, connections, references, schedules and unrequested sizing. Review
-  supply-air versus OA, turndown/EMS overrides and flow/sizing warnings; honor
-  simulation readiness. Reverse/reheat-flow-limit edits require supported water
-  reheat controls. Terminal class/method changes, coil ratings and topology need
-  separate coverage. Do not generate substitute scripts for covered terminal edits.
-- Use `openstudio-economizer-editor` for explicit in-place economizer type,
-  lockout and temperature/enthalpy cutoff edits on an existing direct OA controller.
-  It preserves ventilation, DCV, schedules, sizing, topology and handles. Review
-  retained additive limits, 100% OA floors and overriding controls; route minimum
-  OA/DCV edits to `openstudio-ventilation-editor`. Use the OA connector for
-  intake/recovery attachment. Do not draft a substitute script for covered economizer work.
-- Use `openstudio-ventilation-editor` for explicit in-place minimum/maximum OA
-  flow, OA schedule-reference and ZoneSum DCV edits on an existing direct OA system.
-  It preserves zone OA/People, schedule contents, sizing, economizer and handles.
-  DCV does not implicitly reset minimum flow or fraction floors: discuss masking
-  floors and require explicit changes. Review occupancy, airflow caps, schedule
-  ranges and sizing warnings; honor simulation readiness. Other MV-method DCV,
-  CO2/IAQ and zone policy need separate coverage; route intake/recovery attachment
-  to `openstudio-outdoor-air-connector`.
-  Do not generate a substitute script for covered ventilation work.
-- Use `openstudio-outdoor-air-connector` to attach a direct OA system at a served
-  loop's main supply inlet, or sensible/latent heat recovery to empty OA/relief
-  streams. Preview both-stream wiring and require explicit flow, effectiveness,
-  power, frost, bypass and outlet-control choices. It does not infer template
-  defaults or resize existing equipment. Shared/dedicated and embedded OA need
-  separate coverage. Use `openstudio-heat-recovery-editor` for explicit in-place
-  performance/control changes on an existing exchanger, preserving its handles,
-  curves and references. Retained curves scale with 100% effectiveness edits.
-  Verify translated outlet/reference setpoints and honor simulation readiness.
-  Do not generate substitute scripts for covered intake or recovery work.
-- Use `openstudio-pump-performance-editor` for explicit in-place head, motor,
-  electric-power sizing, operating-mode or variable-speed power-curve edits on
-  a selected single plant supply/demand pump. Preserve its handles and plumbing;
-  inspect fixed-power/inactive-sizing warnings before promising energy savings.
-  Use `openstudio-pump-replacer` for genuine single constant ↔ variable-speed
-  class changes with explicit curve/minimum flow and flow/power policies. It
-  retains plant boundaries/controls and rejects references requiring migration.
-  Banks and pressure-reset/plant-flow redesign need separate coverage.
-  Do not generate an ad hoc script for a covered pump edit.
-- Use `openstudio-supply-fan-performance-editor` for explicit efficiency/pressure changes
-  to an existing air loop's sole direct constant- or variable-volume supply fan.
-  It edits the existing fan in place and preserves its handle, connections,
-  metadata, incoming references, flow controls and unselected model state.
-  Use `openstudio-supply-fan-replacer` for a genuine constant-volume ↔ variable-
-  volume class change, with explicit performance/curve, Autosize and terminal/
-  system-sizing preservation choices. It preserves air boundaries and translated
-  controls, reports new identities, and rejects references requiring migration.
-  Whole-system VAV/CAV conversion needs separate coverage.
-  Embedded fans need separate coverage. Whole-system VAV/CAV construction uses
-  the shared fan functions inside its parent transaction.
-- Use `openstudio-water-coil-editor` for existing main-supply water-coil ratings,
-  name, availability, Autosize resets and controller settings. These are in-place
-  setters preserving coil, controller, connection, metadata and reference handles,
-  including EMS/LifeCycleCost. Use `openstudio-water-coil-connector` to attach
-  a new water coil at the selected air loop's supply outlet and compatible existing
-  plant demand branch, or to migrate an existing main-supply coil to another ready
-  water plant with explicit Autosize resets. Migration preserves coil/controller/
-  air identities; it requires a dedicated single-coil demand branch and may rebuild
-  water nodes/connections. Present both plants and sizing/identity effects. New
-  attachment requires explicit design, schedule, sizing and controller choices;
-  interior/inlet attachment is unsupported. Same-class replacement is not exported.
-  Use the connector's `relocate_air` operation for a main-supply water coil moved
-  immediately upstream of a selected supply outlet on the same or another unsplit
-  air loop, with explicit Autosize. It preserves equipment/controller and plant
-  branch identities, updates the sensor, and reports the removed interior air node
-  and all affected zones. No zone reassignment or system resizing is implicit.
-  Use `openstudio-coil-replacer` for genuine main-supply heating-water to electric
-  conversion, with explicit efficiency, preserved temperature control, Autosize and reference
-  policy. It preserves schedule/air boundaries/coil metadata, creates a new coil
-  and removes the owned water controller/branch; external references block its
-  initial Reject policy. Show fuel, remaining-plant-load and identity effects.
-  Other class conversions and OA/unitary/terminal coils need separate coverage.
-  Whole VAV/CAV creation shares these setters within its parent transaction.
-- Use `openstudio-plant-loop-creator` independently for hot/chilled-water plant
-  construction, including associated condenser systems. It supports direct plant
-  requests and plant stages of broader HVAC workflows, without requiring VAV.
-  Pass its output and plant names/handles to the selected air-side skill for water
-  coil demand connections; VAV is one supported consumer.
-- Use `openstudio-hvac-remover` independently for selected air-loop/VRF/zone-
-  equipment removal. For requested replacement, compose removal, plant creation
-  and air-side creation as needed, carrying each reviewed output forward.
-  Shared-system removal must expose every affected zone and preserve unselected
-  systems/plants. Do not generate ad hoc scripts for these covered operations.
+- For HVAC creation, sizing, topology, or equipment edits, load `hvac-modeler`
+  from the OpenStudio SI HVAC Modeler plugin. If unavailable, identify the
+  specialist plugin needed for the local bundled workflow.
+- When resuming workflow state or lessons, resolve old `openstudio-si:` HVAC
+  skill names to their equivalents in `openstudio-si-hvac`. Preserve existing
+  state and lineage. If the capability or its core dependency is unavailable,
+  stop the covered HVAC workflow. Do not draft a replacement SDK script.
+- For plugin readiness, load `doctor-openstudio-si`. Pass the active
+  `hvac-modeler` plugin root to the doctor with `--plugin-dir` if that skill
+  is available. Report each known plugin's description and status.
+- Use `openstudio_sdk_model_editor` for general local OSM inspection and edits.
+- Use `view-openstudio-geometry` to produce a read-only geometry viewer.
 - Use `openstudio_workflow_state` for long-running OpenStudio energy modeling
   tasks that span multiple phases, child skills, scripts, simulations, failure
   recovery steps, or clarification gates.
@@ -229,15 +87,9 @@ Docker socket without the user's explicit action.
 Select the provider first: configured, compatible NLR OpenStudio MCP has priority,
 including VAV requests. Use the local routes only when NLR is absent, unavailable,
 incompatible or cannot cover the request, following its recorded transition rules.
-Then choose the owning skill before loading documentation or drafting code. For
-supported VAV creation, use `openstudio_vav_reheat_system_creator` directly.
-Run its reviewed scripts rather than offering a runtime/measure/script choice.
-For HVAC diagrams or topology review, use `openstudio-hvac-visualizer` after the
-same NLR provider gate. Its read-only bundle produces a full local graph and
-overview/per-system Mermaid views without simulation or weather prerequisites.
-Do not reconstruct topology with ad hoc scripts or upload its private diagrams
-as part of automatic failure reporting.
-Do not automatically substitute code drafting when a bundled operation fails.
+Then choose the owning skill before loading documentation or drafting code.
+Use `hvac-modeler` for the HVAC capability catalog. Do not automatically
+substitute code drafting when a bundled operation fails.
 
 For local SDK work, `openstudio_sdk_model_editor` enforces the exact
 package-required OpenStudio release through its standalone doctor and shared

@@ -5,43 +5,18 @@ OpenStudio SI is a Codex plugin package for building-energy modeling workflows u
 ## What It Includes
 
 - `.mcp.json`: registers the `openstudio_si` MCP server.
-- `skills/`: Codex-native workflows for orchestration, setup, model editing, simulation, results, learning capture, and HVAC workflows.
+- `skills/`: Codex-native workflows for orchestration, setup, model editing, simulation, results, and learning capture.
 - `skills/*/references/`: reviewed SDK context packs, prompt contracts, blackboard schemas, and learning schemas used by the owning skills.
 - `skills/setup-openstudio-si/scripts/`: marketplace runtime setup helpers.
 
 ## Skills
 
-- `add-vav-reheat`
 - `capture-session-lesson`
 - `curate-learning`
 - `delegated-nlr-modeling`
 - `github-issue-submitter`
-- `hvac-sizing-assistant`
-- `openstudio-boiler-performance-editor`
-- `openstudio-cav-system-creator`
-- `openstudio-chiller-performance-editor`
-- `openstudio-coil-replacer`
-- `openstudio-district-capacity-editor`
-- `openstudio-economizer-editor`
-- `openstudio-heat-recovery-editor`
-- `openstudio-hvac-remover`
-- `openstudio-hvac-visualizer`
 - `openstudio-modeling-orchestrator`
-- `openstudio-outdoor-air-connector`
-- `openstudio-plant-equipment-replacer`
-- `openstudio-plant-loop-creator`
-- `openstudio-pump-performance-editor`
-- `openstudio-pump-replacer`
 - `openstudio-sdk-model-editor`
-- `openstudio-supply-fan-performance-editor`
-- `openstudio-supply-fan-replacer`
-- `openstudio-terminal-editor`
-- `openstudio-terminal-replacer`
-- `openstudio-tower-performance-editor`
-- `openstudio-vav-reheat-system-creator`
-- `openstudio-ventilation-editor`
-- `openstudio-water-coil-connector`
-- `openstudio-water-coil-editor`
 - `openstudio-workflow-state`
 - `propose-measure`
 - `query-energy-standards`

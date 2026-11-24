@@ -1,0 +1,123 @@
+---
+name: openstudio-plant-loop-creator
+description: Create hot-water and chilled-water plants, including condenser loops for water-cooled chillers, with reviewed bundled SDK scripts.
+metadata:
+  version: 0.2.0
+---
+
+## Core preflight
+
+Before using this capability, locate the active OpenStudio SI core plugin via
+its `delegated-nlr-modeling` skill in this session. Use host Python to run
+`<core-plugin-root>/skills/setup-openstudio-si/scripts/doctor_runtime.py --core-metadata`.
+Require `ok: true`, `plugin_version` >=0.5.0 <0.6.0, and
+`plugin_contract_version` 6.0. If the core plugin is missing
+or incompatible, stop the covered HVAC workflow and ask the user to enable
+or update it. Do not draft a replacement SDK script.
+
+Local topology inspection and bundled SDK edits use this disk check and the owning
+skill's local OpenStudio preflight. A live OpenStudio SI MCP connection is required
+for simulation and results. For those steps, use `runtime_plugin_compatibility`
+to verify the connected core plugin and runtime are both >=0.5.0 <0.6.0 and
+declare the compatible contract. Keep the existing provider-selection rules.
+
+If inventory or preflight returns `status: requires_preparation`, run this bundled
+operation through the verified CLI before any modeling plan:
+
+```text
+<verified-cli> execute_python_script <skill>/scripts/prepare_model.py --input <original.osm> --output <new-prepared.osm> --report <new-preparation.json>
+```
+
+Store its `state_patch` and original → prepared `lineage` in workflow state. Use
+`output_model_path` for a fresh inventory and preflight; never reuse the blocked
+plan or write an ad hoc normalizer. `already_current` reuses the input and writes
+no model. Invalid current-version references require diagnosis rather than
+manufactured repair. See [model preparation](../../sdk/references/model_preparation.md).
+
+These script paths are fixed launchers into the installed plugin's shared `sdk/`
+library. Keep the complete plugin together when copying or distributing it. A
+`plugin_incomplete` result requires restoring the complete plugin; do not search
+for another SDK library or generate a replacement script. Setup remains the
+usual plugin installation plus this skill's doctor.
+
+Unexpected execution failures route to `report-openstudio-failure` before
+recovery; pass any `failure_receipt`. Expected readiness/input questions,
+including `requires_preparation`, do not submit.
+
+Prefer configured, compatible NLR through `delegated-nlr-modeling`. Use this local
+bundle only after provider selection/fallback and any required host-path transition.
+Scripts execute directly through host tools, without a modeling MCP prerequisite.
+
+This is an independent plant-building skill for direct plant requests and plant
+stages of broader HVAC workflows, not just missing-plant preparation for VAV.
+Builds include supply equipment, pumps, controls and chiller-to-condenser
+connections. Air-side water coils are connected to plant demand branches by the
+selected air-side skill, using this skill's output model and plant names/handles.
+Do not automatically add VAV or remove existing HVAC after a plant-only request.
+
+Run `scripts/doctor.py` with host Python 3.10+, then use its verified exact-release
+OpenStudio executable. Resolve scripts from this SKILL.md's directory (Claude:
+`${CLAUDE_SKILL_DIR}`). Never bypass the doctor/entrypoint guards with another SDK.
+
+Inspect existing plants before creating duplicates. Fuel/source selection and
+`defaults_profile: prototype_plants_v1` require the human's explicit choice;
+missing plants do not authorize a new fuel or generic assumptions. Explain that
+matching fuel alone does not establish a fair HVAC performance comparison.
+
+Use an absolute input and new output/report paths. Inventory:
+
+```text
+<verified-cli> execute_python_script <skill>/scripts/plant_loops.py --input <input.osm> --report <inventory.json>
+```
+
+Config example after the human chooses these sources and generic defaults:
+
+```json
+{
+  "output_model_path": "/absolute/path/with-plants.osm",
+  "defaults_profile": "prototype_plants_v1",
+  "hot_water": {"name": "Hot Water Loop", "source": "NaturalGas"},
+  "chilled_water": {"name": "Chilled Water Loop", "source": "AirCooled", "pumping": "const_pri"}
+}
+```
+
+Either plant can be omitted. HW sources: NaturalGas/Electricity boilers or
+DistrictHeatingWater. CHW sources: AirCooled/WaterCooled electric EIR chillers or
+DistrictCooling. HW pumping: Variable/Constant. CHW pumping: const_pri or
+const_pri_var_sec (generic common pipe, not PRM heat-exchanger/EMS). `num_chillers`
+is 1–3; district cooling uses one source. Optional SI overrides:
+`supply_temperature_c`, `delta_temperature_k`; HW `boiler_efficiency`.
+WaterCooled creates a new condenser loop named `<CHW name> Condenser`, or the
+explicit `condenser_name`, with a variable-speed two-cell tower and wet-bulb
+following setpoint. Existing condenser reuse is outside this initial bundle.
+
+The approved profile uses prototype 180 F/20 R HW, 44 F/10.1 R CHW, 60 ft pump
+head (15/45 ft primary/secondary), 0.9 motor efficiency, boiler efficiency 0.78
+unless overridden, and COP 3.517/1.188 air-cooled or 3.517/0.66 water-cooled.
+Condenser design is fixed 85 F/10 R, minimum setpoint 70 F, approach 7 R, pump
+49.7 ft. Weather-derived/PRM sizing, heat-pump plants, waterside economizers and
+standards postprocessing are outside this profile. Equipment capacity/flow and
+unspecified performance curves retain the pinned SDK defaults/autosizing.
+
+```text
+<verified-cli> execute_python_script <skill>/scripts/plant_loops.py --input <input.osm> --config <config.json> --report <plan.json>
+<verified-cli> execute_python_script <skill>/scripts/plant_loops.py --plan <plan.json> --report <apply.json>
+```
+
+Review the full saved assumptions and selected sources; require preflight
+`ok: true`, `ready: true`. Apply requires the exact saved plan and rechecks its
+hash/configuration. Require saved getter/topology and EnergyPlus translation
+validation before using the output. Source and existing outputs are preserved;
+resources follow the companion workflow. Keep OSM and `<stem>/` together; CSV
+outputs marked `requires_companion_workflow` need Model.load/workflow attachment.
+
+For a requested air-side stage, pass the output and plant names/handles to its
+skill. For VAV, use them in a fresh VAV preflight against the output model;
+its water-coil creation connects the coils to the selected plants. Plant building
+and air-side creation are separate reviewed transactions. Do not draft
+plant code as a workaround. Sizing, performance comparison and simulation use
+their separate workflows; creation/translation do not prove annual performance.
+
+## Energy code values
+
+Applies only when the user asks for code-compliant or code-minimum values or names a standard (for example "per 90.1-2019"); otherwise keep the behavior above. Load `query-energy-standards` to resolve `boiler_efficiency` (`hvac_minimum_requirements_boilers`), chiller COP (`..._chillers`; convert kW/ton, EER or IPLV to COP and record the conversion), cooling-tower requirements (`..._heat_rejection`) and pump motor efficiency (`..._motors`). Pass resolved values as explicit configuration fields instead of the `prototype_plants_v1` defaults, which remain a generic choice that needs explicit human approval. Confirm `standard`, `template`, `climate_zone` and `path` with the user instead of assuming them, and record the source of each value used. If the `building_energy_standards` tools are unavailable or return no matching row, say so and ask the user for the value; never invent a code value.

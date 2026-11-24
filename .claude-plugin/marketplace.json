@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "openstudio-si-local",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Local marketplace for the OpenStudio SI Claude plugin.",
   "owner": {
     "name": "OpenStudio SI"
@@ -9,9 +9,16 @@
   "plugins": [
     {
       "name": "openstudio-si",
-      "description": "OpenStudio SI harness for OpenStudio model editing, simulation, results, SDK lookup, and reusable workflow skills.",
-      "version": "0.4.2",
+      "description": "Coordinate OpenStudio modeling, select providers, manage sessions and artifacts, run simulations, and query results.",
+      "version": "0.5.0",
       "source": "./openstudio-si",
+      "category": "engineering"
+    },
+    {
+      "name": "openstudio-si-hvac",
+      "description": "Create and size VAV reheat, packaged VAV, and prototype CAV systems, inspect HVAC topology, and edit air-side and plant equipment and controls.",
+      "version": "0.2.0",
+      "source": "./openstudio-si-hvac",
       "category": "engineering"
     }
   ]
