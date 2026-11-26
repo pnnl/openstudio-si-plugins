@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Build, test, and release your first OpenStudio SI plugin for Claude Code and Codex.">
+  <title>Develop a plugin | OpenStudio SI</title>
+  <style>
+    :root { color-scheme: light; --navy:#071b42; --ink:#12213f; --blue:#1d4ed8; --pale:#eff6ff; --muted:#445773; --line:#dbe5f4; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); font:1rem/1.65 system-ui,sans-serif; }
+    a { color:var(--blue); text-underline-offset:.2em; }
+    a:focus-visible { outline:3px solid #2563eb; outline-offset:4px; }
+    .wrap { width:min(70rem, calc(100% - 2rem)); margin-inline:auto; }
+    header { border-bottom:1px solid var(--line); }
+    header .wrap { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem 1.5rem; padding-block:1rem; }
+    header nav { display:flex; flex-wrap:wrap; gap:.5rem 1.25rem; }
+    header a { color:var(--ink); font-weight:650; }
+    .brand { font-weight:800; text-decoration:none; }
+    .brand span { color:var(--blue); margin-right:.4rem; }
+    [aria-current="page"] { color:var(--blue); }
+    .hero { padding:clamp(3rem, 7vw, 6rem) 0; background:linear-gradient(115deg,var(--navy),#173b76); color:white; }
+    .hero p { max-width:42rem; color:#dbeafe; font-size:1.15rem; }
+    h1,h2,h3 { line-height:1.2; letter-spacing:-.025em; }
+    h1 { font-size:clamp(2.4rem, 6vw, 4.8rem); max-width:16ch; margin:.45rem 0 1rem; }
+    h2 { font-size:clamp(1.65rem, 3.5vw, 2.3rem); margin:0 0 1rem; }
+    h3 { font-size:1.15rem; margin:0 0 .5rem; }
+    .label { font-weight:700; font-size:.9rem; }
+    .hero .label { color:#a5f3fc; }
+    .hero .button { display:inline-block; margin-top:.75rem; padding:.65rem 1rem; background:white; color:var(--navy); border-radius:.5rem; font-weight:700; }
+    .layout { display:grid; grid-template-columns:13rem minmax(0, 1fr); gap:clamp(1.5rem,5vw,4rem); padding-block:3rem; }
+    .contents { align-self:start; position:sticky; top:1rem; border-left:2px solid var(--line); padding-left:1rem; }
+    .contents ul { list-style:none; padding:0; margin:.5rem 0 0; }
+    .contents a { display:inline-block; padding:.25rem 0; }
+    section + section { margin-top:3rem; padding-top:2rem; border-top:1px solid var(--line); }
+    section { scroll-margin-top:1rem; }
+    p, ul, dl { margin:.65rem 0 1rem; }
+    li + li { margin-top:.35rem; }
+    .core-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; }
+    .core-list div, .note { background:var(--pale); padding:1rem; border:1px solid var(--line); border-radius:.55rem; }
+    dt { font-weight:740; }
+    dd { margin:.25rem 0 0; color:var(--muted); }
+    pre { background:var(--navy); color:#f0f6ff; border-radius:.55rem; padding:1rem; overflow:auto; font-size:.92rem; }
+    pre:focus-visible { outline:3px solid #2563eb; outline-offset:3px; }
+    p code, li code { overflow-wrap:anywhere; }
+    footer { border-top:1px solid var(--line); padding-block:1.5rem; }
+    @media (max-width:46rem) {
+      .layout { grid-template-columns:minmax(0,1fr); padding-block:1.5rem; }
+      .contents { position:static; }
+      .core-list { grid-template-columns:minmax(0,1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="brand" href="index.html"><span aria-hidden="true">◫</span>OpenStudio SI</a>
+      <nav aria-label="Site">
+        <a href="index.html">Overview</a>
+        <a href="install.html">Installation</a>
+        <a href="develop.html" aria-current="page">Develop a plugin</a>
+        <a href="https://github.com/pnnl/openstudio-si-plugins">GitHub</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="hero">
+      <div class="wrap">
+        <div class="label">Developer quickstart</div>
+        <h1>Build your first OpenStudio SI plugin</h1>
+        <p>Give Claude Code and Codex one new skill. Start with a read-only summary of an OpenStudio model, verify it against a small fixture, and package it for both hosts.</p>
+        <a class="button" href="#scaffold">Start the tutorial</a>
+      </div>
+    </div>
+    <div class="wrap layout">
+      <nav class="contents" aria-label="On this page">
+        <strong>On this page</strong>
+        <ul>
+          <li><a href="#core">What core offers</a></li>
+          <li><a href="#scaffold">1. Create the project</a></li>
+          <li><a href="#skill">2. Add the summary skill</a></li>
+          <li><a href="#verify">3. Verify and export</a></li>
+          <li><a href="#publish">4. Submit a release</a></li>
+        </ul>
+      </nav>
+      <div>
+        <section id="core">
+          <h2>What OpenStudio SI core offers</h2>
+          <p>The <code>openstudio-si</code> host plugin coordinates OpenStudio projects. Specialist plugins can build on these services while owning their own skills and scripts.</p>
+          <dl class="core-list">
+            <div><dt>Orchestration and providers</dt><dd>Route requests to an appropriate workflow or modeling provider, including NLR OpenStudio-MCP when configured and compatible.</dd></div>
+            <div><dt>Workflow state and artifacts</dt><dd>Track sessions, model lineage, assumptions, and outputs across a multi-step modeling task.</dd></div>
+            <div><dt>Runtime and readiness</dt><dd>Set up and diagnose the core runtime. Plugin doctor checks declared prerequisites and reports which capabilities have enough evidence to use.</dd></div>
+            <div><dt>Simulation and results</dt><dd>Run simulations, collect artifacts, and query results through the core MCP runtime.</dd></div>
+          </dl>
+          <p><strong>Declare what your plugin uses.</strong> HVAC Modeler owns HVAC workflows and requires a compatible core installation. Local HVAC inspection and edits can check core on disk. Simulation and results use the live core runtime. The OSM example below has a single runtime dependency, OpenStudio SDK 3.11.0, and can run independently.</p>
+          <p class="note">The PyPI extra <code>openstudio-si[plugin-dev]</code> installs the developer CLI. Installing and enabling the core <em>host plugin</em> is a separate step for users of capabilities that depend on it. <a href="install.html">See installation options</a>.</p>
+        </section>
+        <section id="scaffold">
+          <h2>1. Create the project</h2>
+          <p>Use Python 3.13 on a platform supported by the OpenStudio wheel. Run these commands in Bash or Zsh from the directory that will hold the new repository. The bootstrap environment stays in a temporary directory.</p>
+          <pre tabindex="0"><code>bootstrap="$(mktemp -d)"
+python3.13 -m venv "$bootstrap"
+"$bootstrap/bin/python" -m pip install 'openstudio-si[plugin-dev]==0.5.1'
+"$bootstrap/bin/openstudio-si" plugin init ./osm-model-summary \
+  --id osm-model-summary --name "OSM Model Summary" \
+  --owner my-lab --maintainer "Your Name" --license MIT
+cd osm-model-summary
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install 'openstudio-si[plugin-dev]==0.5.1'</code></pre>
+          <p>Choose your own owner ID, maintainer and approved license. The template provides the source manifest, starter skill, evaluation examples, and GitHub Actions configuration stubs.</p>
+        </section>
+        <section id="skill">
+          <h2>2. Add the summary skill</h2>
+          <p>Rename <code>plugin/skills/osm-model-summary</code> to <code>plugin/skills/summarize-osm</code>. Add the skill instructions and bundled Python script from the <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#2-replace-the-starter-skill">full OSM walkthrough</a>. The script reads an <code>.osm</code> file and reports stories, spaces, zones, and air and plant loops without saving or simulating the model.</p>
+          <p>In <code>plugin/openstudio-si-plugin.yaml</code>, keep your ownership and release version, declare OpenStudio 3.11.0 as a required Python distribution, and add the read-only summary capability. <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#3-declare-identity-capabilities-and-prerequisites">Copy the manifest example</a>.</p>
+        </section>
+        <section id="verify">
+          <h2>3. Verify and export</h2>
+          <p>Replace the starter evaluation examples with the <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#4-build-a-small-redistributable-fixture-and-verify-directly">two-zone fixture</a> and <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#5-replace-the-demonstration-evaluation-cases">matching case</a>. Run the script directly and confirm one story, two spaces, two thermal zones, zero air and plant loops, and unchanged input bytes.</p>
+          <pre tabindex="0"><code>openstudio-si plugin check-project .
+mkdir -p dist
+openstudio-si plugin export ./plugin --host all --output ./dist/plugin \
+  &gt; dist/export-report.json
+openstudio-si plugin check-hosts dist/export-report.json</code></pre>
+          <p>Confirm each export has one skill and zero MCP servers. The host check needs both CLIs. Load the appropriate export in your host and ask it to summarize the fixture. You can run an optional local agent evaluation. LLM scores are advisory and stay outside release CI.</p>
+        </section>
+        <section id="publish">
+          <h2>4. Submit a release</h2>
+          <ol>
+            <li>Push the project to your own public GitHub repository. Configure the template's workflows with <code>openstudio-si plugin configure-ci</code> using a reviewed harness commit SHA and an exact published tooling version.</li>
+            <li>Ask the marketplace maintainers to register your plugin ID, source repository, manifest owner, and plugin path.</li>
+            <li>Run <code>openstudio-si plugin check-project . --require-tracked</code> locally before tagging. Publish a stable GitHub release such as <code>v0.1.0</code> matching your manifest. The release workflow attaches <code>release.json</code> and both host archives.</li>
+            <li>Your repository publishes the release assets with its own GitHub permissions. Once the marketplace importer is enabled and your plugin is enrolled, central polling verifies the release and prepares a PR for maintainer review.</li>
+          </ol>
+          <p><a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_PUBLISHING.md#laboratory-workflow">Publishing and enrollment details</a></p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><a href="index.html">OpenStudio SI overview</a></div></footer>
+</body>
+</html>
