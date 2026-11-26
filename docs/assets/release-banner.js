@@ -1,6 +1,6 @@
 window.OPENSTUDIO_SI_LATEST_RELEASE = {
-  "version": "0.5.0",
-  "url": "https://github.com/pnnl/openstudio-si-plugins/releases/tag/v0.5.0",
+  "version": "0.5.1",
+  "url": "https://github.com/pnnl/openstudio-si-plugins/releases/tag/v0.5.1",
   "summary": "See the release notes for changes and installation guidance."
 };
 
