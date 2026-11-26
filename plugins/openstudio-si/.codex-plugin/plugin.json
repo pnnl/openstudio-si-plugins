@@ -1,6 +1,6 @@
 {
   "name": "openstudio-si",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Coordinate OpenStudio modeling, select providers, manage sessions and artifacts, run simulations, and query results.",
   "author": {
     "name": "OpenStudio SI"
