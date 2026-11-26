@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "openstudio-si-local",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Local marketplace for the OpenStudio SI Claude plugin.",
   "owner": {
     "name": "OpenStudio SI"
@@ -10,7 +10,7 @@
     {
       "name": "openstudio-si",
       "description": "Coordinate OpenStudio modeling, select providers, manage sessions and artifacts, run simulations, and query results.",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "source": "./openstudio-si",
       "category": "engineering"
     },

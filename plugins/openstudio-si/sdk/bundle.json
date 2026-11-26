@@ -18,5 +18,5 @@
     "schemas/preparation_report.schema.json": "fe95b1f3abc04d3465ae44edacfe48dbef4d9d76453b79e7b24c6842b213d9d8",
     "sdk_probe.py": "432063c5bf366bfaa0be193c9bdf64b06bf97229b0dff8c59f4c7f35720a7712"
   },
-  "plugin_version": "0.5.0"
+  "plugin_version": "0.5.1"
 }
