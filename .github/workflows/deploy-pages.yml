@@ -1,14 +1,12 @@
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - docs/**
-      - .github/workflows/deploy-pages.yml
+  # Pages already builds main:/docs on pushes. The release-banner workflow
+  # dispatches this workflow because its GITHUB_TOKEN push skips that build.
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -19,6 +17,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -29,9 +28,27 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
+        id: pages-artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
+      - name: Wait for the Pages artifact to be indexed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGES_ARTIFACT_ID: ${{ steps.pages-artifact.outputs.artifact_id }}
+        run: |
+          set -euo pipefail
+          [[ "$PAGES_ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          for delay in 1 2 4 8 16 0; do
+            if gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=github-pages" \
+              | jq -e --argjson id "$PAGES_ARTIFACT_ID" \
+                'any(.artifacts[]; .id == $id and .expired == false)' > /dev/null; then
+              exit 0
+            fi
+            if (( delay > 0 )); then sleep "$delay"; fi
+          done
+          echo "::error::The uploaded github-pages artifact is not visible in the workflow run's artifact list."
+          exit 1
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

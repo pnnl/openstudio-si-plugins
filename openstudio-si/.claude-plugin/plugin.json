@@ -1,8 +1,8 @@
 {
   "name": "openstudio-si",
   "displayName": "OpenStudio SI",
-  "version": "0.4.2",
-  "description": "OpenStudio SI harness for model editing, simulation, results, SDK lookup, and reusable building-energy workflow skills.",
+  "version": "0.5.1",
+  "description": "Coordinate OpenStudio modeling, select providers, manage sessions and artifacts, run simulations, and query results.",
   "author": {
     "name": "OpenStudio SI"
   },

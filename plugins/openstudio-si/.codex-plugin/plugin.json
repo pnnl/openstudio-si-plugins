@@ -1,7 +1,7 @@
 {
   "name": "openstudio-si",
-  "version": "0.4.2",
-  "description": "OpenStudio SI harness for OpenStudio model editing, simulation, results, SDK lookup, and reusable workflow skills.",
+  "version": "0.5.1",
+  "description": "Coordinate OpenStudio modeling, select providers, manage sessions and artifacts, run simulations, and query results.",
   "author": {
     "name": "OpenStudio SI"
   },
@@ -27,7 +27,7 @@
     ],
     "defaultPrompt": [
       "Inspect this OpenStudio model.",
-      "Add a VAV reheat system.",
+      "Check which OpenStudio SI plugins are ready.",
       "Run simulation and summarize results."
     ],
     "brandColor": "#2563EB",
