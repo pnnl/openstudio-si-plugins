@@ -1,0 +1,78 @@
+name: Import registered plugin releases
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      plugin-id:
+        description: Optional registered plugin ID; empty checks all sources
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: marketplace-release-import
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.repository == 'pnnl/openstudio-si-plugins' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install centrally selected published tooling
+        env:
+          TOOLING_VERSION: ${{ vars.PLUGIN_TOOLING_VERSION }}
+        run: |
+          [[ "$TOOLING_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          python -m pip install --only-binary=:all: --index-url https://pypi.org/simple "openstudio-si[plugin-dev]==$TOOLING_VERSION"
+          openstudio-si plugin marketplace-poll --help
+      - name: Prepare pinned host readers without lifecycle installers
+        run: |
+          npm install --ignore-scripts --prefix "$RUNNER_TEMP/hosts" @anthropic-ai/claude-code@2.1.309 @openai/codex@0.169.0-alpha.11.1
+          echo "$RUNNER_TEMP/hosts/node_modules/.bin" >> "$GITHUB_PATH"
+          openstudio-si plugin prepare-hosts "$RUNNER_TEMP/hosts" --output-dir "$RUNNER_TEMP/host-bin"
+          echo "$RUNNER_TEMP/host-bin" >> "$GITHUB_PATH"
+      - name: Verify registered release assets, source, graph and native hosts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PLUGIN_ID: ${{ inputs.plugin-id }}
+        run: |
+          args=()
+          if [ -n "$PLUGIN_ID" ]; then args+=(--plugin-id "$PLUGIN_ID"); fi
+          openstudio-si plugin marketplace-poll --marketplace . --base-sha "$(git rev-parse HEAD)" --native-hosts --output "$RUNNER_TEMP/proposals" "${args[@]}"
+          cat "$RUNNER_TEMP/proposals/summary.json" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: verified-marketplace-proposals
+          path: ${{ runner.temp }}/proposals/
+          include-hidden-files: true
+          if-no-files-found: error
+  publish:
+    needs: verify
+    if: github.repository == 'pnnl/openstudio-si-plugins' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: verified-marketplace-proposals
+          path: ${{ runner.temp }}/proposals
+      - name: Open or refresh plugin-scoped release PRs
+        env:
+          GH_TOKEN: ${{ secrets.PLUGINS_PR_TOKEN }}
+        run: |
+          test -n "$GH_TOKEN" || { echo 'Configure the central PLUGINS_PR_TOKEN secret with contents/PR write access.' >&2; exit 1; }
+          gh auth setup-git
+          python -I .github/scripts/publish_candidates.py --marketplace . --candidates "$RUNNER_TEMP/proposals" --repository "$GITHUB_REPOSITORY"

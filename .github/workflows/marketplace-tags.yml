@@ -1,0 +1,28 @@
+name: Tag validated plugin releases
+on:
+  workflow_run:
+    workflows: ['Validate marketplace']
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: marketplace-release-tags
+  cancel-in-progress: false
+jobs:
+  tag:
+    if: github.repository == 'pnnl/openstudio-si-plugins' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Create immutable per-plugin dependency tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          gh auth setup-git
+          python -I .github/scripts/tag_plugin_releases.py --marketplace . --source-sha "$VALIDATED_SHA"
