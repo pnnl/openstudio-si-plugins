@@ -3,47 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Build, test, and release your first OpenStudio SI plugin for Claude Code and Codex.">
-  <title>Develop a plugin | OpenStudio SI</title>
-  <style>
-    :root { color-scheme: light; --navy:#071b42; --ink:#12213f; --blue:#1d4ed8; --pale:#eff6ff; --muted:#445773; --line:#dbe5f4; }
-    * { box-sizing:border-box; }
-    body { margin:0; color:var(--ink); font:1rem/1.65 system-ui,sans-serif; }
-    a { color:var(--blue); text-underline-offset:.2em; }
-    a:focus-visible { outline:3px solid #2563eb; outline-offset:4px; }
-    .wrap { width:min(70rem, calc(100% - 2rem)); margin-inline:auto; }
-    .hero { padding:clamp(3rem, 7vw, 6rem) 0; background:linear-gradient(115deg,var(--navy),#173b76); color:white; }
-    .hero p { max-width:42rem; color:#dbeafe; font-size:1.15rem; }
-    h1,h2,h3 { line-height:1.2; letter-spacing:-.025em; }
-    h1 { font-size:clamp(2.4rem, 6vw, 4.8rem); max-width:16ch; margin:.45rem 0 1rem; }
-    h2 { font-size:clamp(1.65rem, 3.5vw, 2.3rem); margin:0 0 1rem; }
-    h3 { font-size:1.15rem; margin:0 0 .5rem; }
-    .label { font-weight:700; font-size:.9rem; }
-    .hero .label { color:#a5f3fc; }
-    .hero .button { display:inline-block; margin-top:.75rem; padding:.65rem 1rem; background:white; color:var(--navy); border-radius:.5rem; font-weight:700; }
-    .layout { display:grid; grid-template-columns:13rem minmax(0, 1fr); gap:clamp(1.5rem,5vw,4rem); padding-block:3rem; }
-    .contents { align-self:start; position:sticky; top:1rem; border-left:2px solid var(--line); padding-left:1rem; }
-    .contents ul { list-style:none; padding:0; margin:.5rem 0 0; }
-    .contents a { display:inline-block; padding:.25rem 0; }
-    section + section { margin-top:3rem; padding-top:2rem; border-top:1px solid var(--line); }
-    section { scroll-margin-top:1rem; }
-    p, ul, dl { margin:.65rem 0 1rem; }
-    li + li { margin-top:.35rem; }
-    .core-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; }
-    .core-list div, .note { background:var(--pale); padding:1rem; border:1px solid var(--line); border-radius:.55rem; }
-    dt { font-weight:740; }
-    dd { margin:.25rem 0 0; color:var(--muted); }
-    pre { background:var(--navy); color:#f0f6ff; border-radius:.55rem; padding:1rem; overflow:auto; font-size:.92rem; }
-    pre:focus-visible { outline:3px solid #2563eb; outline-offset:3px; }
-    p code, li code { overflow-wrap:anywhere; }
-    footer { border-top:1px solid var(--line); padding-block:1.5rem; }
-    @media (max-width:46rem) {
-      .layout { grid-template-columns:minmax(0,1fr); padding-block:1.5rem; }
-      .contents { position:static; }
-      .core-list { grid-template-columns:minmax(0,1fr); }
-    }
-  </style>
+  <meta name="description" content="OpenStudio SI plugin developer guide, CLI and schemas, with a complete OSM summary walkthrough.">
+  <title>Plugin developer guide | OpenStudio SI</title>
   <link rel="stylesheet" href="assets/site-header.css">
+  <link rel="stylesheet" href="assets/developer-docs.css">
+  <script src="assets/developer-docs.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -57,82 +21,2089 @@
       </nav>
     </div>
   </header>
-  <main>
-    <div class="hero">
-      <div class="wrap">
-        <div class="label">Developer quickstart</div>
-        <h1>Build your first OpenStudio SI plugin</h1>
-        <p>Give Claude Code and Codex one new skill. Start with a read-only summary of an OpenStudio model, verify it against a small fixture, and package it for both hosts.</p>
-        <a class="button" href="#scaffold">Start the tutorial</a>
-      </div>
-    </div>
-    <div class="wrap layout">
-      <nav class="contents" aria-label="On this page">
-        <strong>On this page</strong>
-        <ul>
-          <li><a href="#core">What core offers</a></li>
-          <li><a href="#scaffold">1. Create the project</a></li>
-          <li><a href="#skill">2. Add the summary skill</a></li>
-          <li><a href="#verify">3. Verify and export</a></li>
-          <li><a href="#publish">4. Submit a release</a></li>
-        </ul>
+  <div class="docs-layout">
+    <details class="docs-drawer" open>
+      <summary>Developer guide navigation</summary>
+      <nav aria-label="Developer documentation">
+        <p class="nav-label">Developer guide</p>
+        <a href="#quickstart">Quickstart</a>
+<a href="#core">What core offers</a>
+<a href="#project">Project layout</a>
+<a href="#cli">CLI reference</a>
+<a href="#specs">Plugin specifications</a>
+<a href="#walkthrough">OSM walkthrough</a>
+        <div class="subnav">
+          <a href="#osm-skill">Skill and script</a>
+          <a href="#osm-fixture">Fixture and evaluation</a>
+          <a href="#osm-test">Export and test</a>
+        </div>
+        <a href="#publish">Release a plugin</a>
       </nav>
-      <div>
-        <section id="core">
-          <h2>What OpenStudio SI core offers</h2>
-          <p>The <code>openstudio-si</code> host plugin coordinates OpenStudio projects. Specialist plugins can build on these services while owning their own skills and scripts.</p>
-          <dl class="core-list">
-            <div><dt>Orchestration and providers</dt><dd>Route requests to an appropriate workflow or modeling provider, including NLR OpenStudio-MCP when configured and compatible.</dd></div>
-            <div><dt>Workflow state and artifacts</dt><dd>Track sessions, model lineage, assumptions, and outputs across a multi-step modeling task.</dd></div>
-            <div><dt>Runtime and readiness</dt><dd>Set up and diagnose the core runtime. Plugin doctor checks declared prerequisites and reports which capabilities have enough evidence to use.</dd></div>
-            <div><dt>Simulation and results</dt><dd>Run simulations, collect artifacts, and query results through the core MCP runtime.</dd></div>
-          </dl>
-          <p><strong>Declare what your plugin uses.</strong> HVAC Modeler owns HVAC workflows and requires a compatible core installation. Local HVAC inspection and edits can check core on disk. Simulation and results use the live core runtime. The OSM example below has a single runtime dependency, OpenStudio SDK 3.11.0, and can run independently.</p>
-          <p class="note">The PyPI extra <code>openstudio-si[plugin-dev]</code> installs the developer CLI. Installing and enabling the core <em>host plugin</em> is a separate step for users of capabilities that depend on it. <a href="install.html">See installation options</a>.</p>
-        </section>
-        <section id="scaffold">
-          <h2>1. Create the project</h2>
-          <p>Use Python 3.13 on a platform supported by the OpenStudio wheel. Run these commands in Bash or Zsh from the directory that will hold the new repository. The bootstrap environment stays in a temporary directory.</p>
-          <pre tabindex="0"><code>bootstrap="$(mktemp -d)"
-python3.13 -m venv "$bootstrap"
-"$bootstrap/bin/python" -m pip install 'openstudio-si[plugin-dev]==0.5.1'
-"$bootstrap/bin/openstudio-si" plugin init ./osm-model-summary \
-  --id osm-model-summary --name "OSM Model Summary" \
-  --owner my-lab --maintainer "Your Name" --license MIT
+    </details>
+
+    <main id="content">
+      <div class="intro">
+        <p class="eyebrow">OpenStudio SI developer documentation</p>
+        <h1>Develop an OpenStudio SI plugin</h1>
+        <p>Build and release skills, scripts, and MCP servers for Claude Code and Codex. This guide uses OpenStudio SI 0.5.1 and includes the CLI reference, schemas, and a complete worked example.</p>
+      </div>
+
+      <section id="quickstart">
+        <h2>Quickstart</h2>
+        <p>Use <strong>Python 3.10 or newer</strong> with a compatible <a href="https://pypi.org/project/openstudio/3.11.0/#files">OpenStudio SDK 3.11.0 wheel</a>. The contributor CI uses Python 3.13. On Windows x64, the SDK publishes wheels for CPython 3.10 through 3.13 within the supported range. Run these commands in Bash or Zsh from the directory where you want the project. If needed, replace <code>python3</code> with the command for your chosen interpreter. The bootstrap environment lives in a temporary directory and the project gets its own <code>.venv</code>.</p>
+        <pre tabindex="0"><code>python3 --version
+bootstrap=&quot;$(mktemp -d)&quot;
+python3 -m venv &quot;$bootstrap&quot;
+&quot;$bootstrap/bin/python&quot; -m pip install &#x27;openstudio-si[plugin-dev]==0.5.1&#x27;
+&quot;$bootstrap/bin/openstudio-si&quot; plugin init ./osm-model-summary --id osm-model-summary \
+  --name &quot;OSM Model Summary&quot; --owner my-lab --maintainer &quot;Your Name&quot; --license MIT
 cd osm-model-summary
-python3.13 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install 'openstudio-si[plugin-dev]==0.5.1'</code></pre>
-          <p>Choose your own owner ID, maintainer and approved license. The template provides the source manifest, starter skill, evaluation examples, and GitHub Actions configuration stubs.</p>
-        </section>
-        <section id="skill">
-          <h2>2. Add the summary skill</h2>
-          <p>Rename <code>plugin/skills/osm-model-summary</code> to <code>plugin/skills/summarize-osm</code>. Add the skill instructions and bundled Python script from the <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#2-replace-the-starter-skill">full OSM walkthrough</a>. The script reads an <code>.osm</code> file and reports stories, spaces, zones, and air and plant loops without saving or simulating the model.</p>
-          <p>In <code>plugin/openstudio-si-plugin.yaml</code>, keep your ownership and release version, declare OpenStudio 3.11.0 as a required Python distribution, and add the read-only summary capability. <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#3-declare-identity-capabilities-and-prerequisites">Copy the manifest example</a>.</p>
-        </section>
-        <section id="verify">
-          <h2>3. Verify and export</h2>
-          <p>Replace the starter evaluation examples with the <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#4-build-a-small-redistributable-fixture-and-verify-directly">two-zone fixture</a> and <a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_OSM_SUMMARY_TUTORIAL.md#5-replace-the-demonstration-evaluation-cases">matching case</a>. Run the script directly and confirm one story, two spaces, two thermal zones, zero air and plant loops, and unchanged input bytes.</p>
-          <pre tabindex="0"><code>openstudio-si plugin check-project .
+python -m pip install &#x27;openstudio-si[plugin-dev]==0.5.1&#x27;</code></pre>
+        <p>Use your organization’s owner ID, maintainer name, and approved license. You can export the generated starter immediately. Use <code>--with-mcp</code> when scaffolding a plugin that needs an MCP server.</p>
+        <pre tabindex="0"><code>openstudio-si plugin check-project .
+openstudio-si plugin validate ./plugin
+mkdir -p dist
+openstudio-si plugin export ./plugin --host all --output ./dist/starter \
+  &gt; dist/starter-report.json</code></pre>
+        <p>Continue with the <a href="#walkthrough">OSM walkthrough</a> to replace the starter with a working model summary.</p>
+      </section>
+
+      <section id="core">
+        <h2>What OpenStudio SI core offers</h2>
+        <dl class="core-grid">
+          <div><dt>Orchestration and providers</dt><dd>Route modeling requests to the right workflow or execution provider, including NLR OpenStudio-MCP when configured and compatible.</dd></div>
+          <div><dt>Workflow state and artifacts</dt><dd>Track sessions, model lineage, assumptions, outputs, and results across modeling steps.</dd></div>
+          <div><dt>Setup and readiness</dt><dd>Set up and diagnose the core runtime. Developer tooling also inspects declared plugin prerequisites and capability readiness.</dd></div>
+          <div><dt>Simulation and results</dt><dd>Launch simulations, collect artifacts, and query results through the core MCP runtime.</dd></div>
+        </dl>
+        <p>Install the core host plugin for capabilities that use these services. For example, HVAC Modeler owns its HVAC skills and requires compatible core. Its local inspection and editing checks can use core metadata on disk. Simulation and results require a live core runtime. The OSM example relies only on the OpenStudio Python SDK.</p>
+        <p>The PyPI extra <code>openstudio-si[plugin-dev]</code> provides the developer CLI. See <a href="install.html">Installation</a> to enable core in a host.</p>
+      </section>
+
+      <section id="project">
+        <h2>Project layout</h2>
+        <pre tabindex="0"><code>my-plugin/
+  AGENTS.md, CLAUDE.md         Contributor guidance
+  .github/workflows/           Validation and release stubs
+  plugin/
+    openstudio-si-plugin.yaml  Identity, dependencies, and capabilities
+    skills/&lt;skill&gt;/SKILL.md    Agent instructions
+    skills/&lt;skill&gt;/scripts/    Skill-local executable helpers
+    .mcp.json                  Optional MCP server configurations
+    evals/cases/               Evaluation cases
+  dist/                        Local host exports and release assets</code></pre>
+        <p>Keep authored source in <code>plugin/</code>. Exports generate the Claude and Codex metadata from the same source. Declare additional package resources with <code>package.include</code> and use paths relative to the plugin root.</p>
+        <p>For an existing repository, scaffold into a temporary project and bring over the plugin manifest, desired skill layout, and workflow stubs. Keep the existing license and set the manifest and reusable workflows for the actual source repository.</p>
+      </section>
+
+      <section id="cli">
+        <h2>CLI reference</h2>
+        <p>The reference below shows command usage and flags from version 0.5.1. Expand a command for its arguments.</p>
+        <details id="plugin-init"><summary><code>openstudio-si plugin init</code></summary><p>Generate a project with a source manifest, a starter skill, evaluation examples, and CI stubs. Use --with-mcp when your plugin needs a server.</p><pre tabindex="0"><code>usage: openstudio-si plugin init [-h] --id IDENTITY
+                                 --license {BSD-2-Clause,BSD-3-Clause,MIT}
+                                 [--copyright-holder COPYRIGHT_HOLDER] [--name NAME]
+                                 [--owner OWNER] [--organization ORGANIZATION]
+                                 [--maintainer MAINTAINER] [--contact CONTACT]
+                                 [--description DESCRIPTION] [--with-mcp]
+                                 [--version VERSION] [--dry-run]
+                                 destination
+
+positional arguments:
+  destination
+
+options:
+  -h, --help            show this help message and exit
+  --id IDENTITY
+  --license {BSD-2-Clause,BSD-3-Clause,MIT}
+  --copyright-holder COPYRIGHT_HOLDER
+  --name NAME
+  --owner OWNER
+  --organization ORGANIZATION
+  --maintainer MAINTAINER
+  --contact CONTACT
+  --description DESCRIPTION
+  --with-mcp            Add an example MCP server alongside the starter skill.
+  --version VERSION
+  --dry-run</code></pre></details>
+<details id="plugin-validate"><summary><code>openstudio-si plugin validate</code></summary><p>Validate a source manifest or an exported host package. Use this before testing or packaging.</p><pre tabindex="0"><code>usage: openstudio-si plugin validate [-h] source
+
+positional arguments:
+  source
+
+options:
+  -h, --help  show this help message and exit</code></pre></details>
+<details id="plugin-check-project"><summary><code>openstudio-si plugin check-project</code></summary><p>Check the generated repository layout and evaluation cases. Run --require-tracked locally after staging intended files so CI can reproduce the export.</p><pre tabindex="0"><code>usage: openstudio-si plugin check-project [-h] [--require-tracked] project
+
+positional arguments:
+  project
+
+options:
+  -h, --help         show this help message and exit
+  --require-tracked  Run locally before tagging to find present untracked inputs; CI
+                     cannot recover files omitted from checkout.</code></pre></details>
+<details id="plugin-export"><summary><code>openstudio-si plugin export</code></summary><p>Generate isolated host packages and print a JSON export report. For --host all, packages are under the output directory in claude/ and codex/. Use a fresh output path.</p><pre tabindex="0"><code>usage: openstudio-si plugin export [-h] [--host {claude,codex,all}] --output OUTPUT
+                                   source
+
+positional arguments:
+  source
+
+options:
+  -h, --help            show this help message and exit
+  --host {claude,codex,all}
+  --output OUTPUT</code></pre></details>
+<details id="plugin-check-hosts"><summary><code>openstudio-si plugin check-hosts</code></summary><p>Check both packages using the Claude and Codex CLIs. Pass the saved export report as input. This checks host loading metadata without running a modeling task.</p><pre tabindex="0"><code>usage: openstudio-si plugin check-hosts [-h] report
+
+positional arguments:
+  report
+
+options:
+  -h, --help  show this help message and exit</code></pre></details>
+<details id="plugin-doctor"><summary><code>openstudio-si plugin doctor</code></summary><p>Inspect dependencies and capability readiness. Use --host with source directories and select --check-runtime with an explicit runtime profile when runtime probes are needed.</p><pre tabindex="0"><code>usage: openstudio-si plugin doctor [-h] [--plugin-dir PLUGIN_DIR]
+                                   [--plugin-id PLUGIN_ID] [--host {claude,codex}]
+                                   [--capability CAPABILITY]
+                                   [--runtime-profile RUNTIME_PROFILE] [--check-runtime]
+
+options:
+  -h, --help            show this help message and exit
+  --plugin-dir PLUGIN_DIR
+  --plugin-id PLUGIN_ID
+  --host {claude,codex}
+                        Select a host and bind explicitly supplied source plugins to it.
+  --capability CAPABILITY
+  --runtime-profile RUNTIME_PROFILE
+                        Host-bound local runtime profile; no probes run without --check-
+                        runtime.
+  --check-runtime       Run bounded probes in explicitly bound runtimes.</code></pre></details>
+<details id="plugin-configure-ci"><summary><code>openstudio-si plugin configure-ci</code></summary><p>Pin reusable contributor workflows to a reviewed full commit SHA and an exact published tooling release. Use --dry-run to preview changes.</p><pre tabindex="0"><code>usage: openstudio-si plugin configure-ci [-h] --workflow-ref WORKFLOW_REF
+                                         [--tooling-version TOOLING_VERSION] [--dry-run]
+                                         project
+
+positional arguments:
+  project
+
+options:
+  -h, --help            show this help message and exit
+  --workflow-ref WORKFLOW_REF
+  --tooling-version TOOLING_VERSION
+                        Exact published openstudio-si version (default: installed
+                        version).
+  --dry-run</code></pre></details>
+<details id="plugin-package-release"><summary><code>openstudio-si plugin package-release</code></summary><p>Package both host ZIPs and release.json from the export report and immutable source identity. The contributor workflow normally runs this step.</p><pre tabindex="0"><code>usage: openstudio-si plugin package-release [-h] --report REPORT --tag TAG
+                                            --repository REPOSITORY
+                                            --source-sha SOURCE_SHA
+                                            project
+
+positional arguments:
+  project
+
+options:
+  -h, --help            show this help message and exit
+  --report REPORT
+  --tag TAG
+  --repository REPOSITORY
+  --source-sha SOURCE_SHA</code></pre></details>
+<details id="plugin-prepare-hosts"><summary><code>openstudio-si plugin prepare-hosts</code></summary><p>Prepare host CLI launchers from an existing npm prefix. This is mainly useful for CI that installs CLIs with lifecycle scripts disabled.</p><pre tabindex="0"><code>usage: openstudio-si plugin prepare-hosts [-h] --output-dir OUTPUT_DIR prefix
+
+positional arguments:
+  prefix
+
+options:
+  -h, --help            show this help message and exit
+  --output-dir OUTPUT_DIR</code></pre></details>
+<details id="plugin-marketplace-poll"><summary><code>openstudio-si plugin marketplace-poll</code></summary><p>Verify enrolled source releases and stage marketplace proposals. This command belongs to the central maintainer workflow.</p><pre tabindex="0"><code>usage: openstudio-si plugin marketplace-poll [-h] --marketplace MARKETPLACE
+                                             --output OUTPUT --base-sha BASE_SHA
+                                             [--plugin-id PLUGIN_ID] [--native-hosts]
+
+options:
+  -h, --help            show this help message and exit
+  --marketplace MARKETPLACE
+  --output OUTPUT
+  --base-sha BASE_SHA
+  --plugin-id PLUGIN_ID
+  --native-hosts</code></pre></details>
+<details id="plugin-validate-marketplace"><summary><code>openstudio-si plugin validate-marketplace</code></summary><p>Check the ownership, release receipts, and host-specific dependency graph of a marketplace checkout.</p><pre tabindex="0"><code>usage: openstudio-si plugin validate-marketplace [-h] [--native-hosts] marketplace
+
+positional arguments:
+  marketplace
+
+options:
+  -h, --help      show this help message and exit
+  --native-hosts</code></pre></details>
+<details id="plugin-sync-core-marketplace"><summary><code>openstudio-si plugin sync-core-marketplace</code></summary><p>Update reserved core and HVAC packages from a paired export while preserving independent plugins.</p><pre tabindex="0"><code>usage: openstudio-si plugin sync-core-marketplace [-h] generated marketplace
+
+positional arguments:
+  generated
+  marketplace
+
+options:
+  -h, --help   show this help message and exit</code></pre></details>
+<details id="eval-run"><summary><code>openstudio-si eval run</code></summary><p>Run the selected local agent-evaluation arms and record evidence. Install the eval extra and use a local configuration.</p><pre tabindex="0"><code>usage: openstudio-si eval run [-h] --plugin PLUGIN --cases CASES --config CONFIG
+                              --output OUTPUT
+
+options:
+  -h, --help       show this help message and exit
+  --plugin PLUGIN
+  --cases CASES
+  --config CONFIG
+  --output OUTPUT</code></pre></details>
+<details id="eval-judge"><summary><code>openstudio-si eval judge</code></summary><p>Score a recorded run with the configured DeepEval judge without repeating the agent task.</p><pre tabindex="0"><code>usage: openstudio-si eval judge [-h] --run RUN --config CONFIG
+
+options:
+  -h, --help       show this help message and exit
+  --run RUN
+  --config CONFIG</code></pre></details>
+<details id="eval-report"><summary><code>openstudio-si eval report</code></summary><p>Render a report from a recorded evaluation run.</p><pre tabindex="0"><code>usage: openstudio-si eval report [-h] --run RUN
+
+options:
+  -h, --help  show this help message and exit
+  --run RUN</code></pre></details>
+
+      </section>
+
+      <section id="specs">
+        <h2>Plugin specifications</h2>
+        <div class="table-wrap" tabindex="0"><table>
+          <thead><tr><th scope="col">Manifest field</th><th scope="col">Contract</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><code>schema_version</code></th><td>Required. Use draft version <code>"0.1"</code>.</td></tr>
+            <tr><th scope="row"><code>id</code>, <code>name</code>, <code>description</code>, <code>version</code></th><td>Required. Use a lowercase hyphenated ID and a SemVer release version. <code>openstudio-si</code> and <code>openstudio-si-hvac</code> are reserved IDs.</td></tr>
+            <tr><th scope="row"><code>owner</code>, <code>license</code>, <code>contributors</code></th><td>Owner and license are required. Record the owner ID and maintainers. Contributors are optional.</td></tr>
+            <tr><th scope="row"><code>compatibility.harness_api</code></th><td>Required. The 0.5.1 tooling implements harness API <code>0.1.0</code>. Declare a range compatible with that API. This is separate from the core plugin version.</td></tr>
+            <tr><th scope="row"><code>dependencies</code></th><td>Required list. Each entry has an ID, kind, target, required flag, and probe. Use an empty list when there are no dependencies.</td></tr>
+            <tr><th scope="row"><code>capabilities</code></th><td>Required. Describe at least one capability and reference dependency IDs in its <code>requires</code> list.</td></tr>
+            <tr><th scope="row"><code>evaluation.cases</code></th><td>Required path to evaluation cases inside the source plugin.</td></tr>
+            <tr><th scope="row"><code>inventory</code>, <code>package.include</code></th><td>Optional. Export discovers skill and MCP counts. Use include paths for extra resources.</td></tr>
+          </tbody>
+        </table></div>
+        <h3>Dependencies and readiness</h3>
+        <p>Supported dependency kinds are plugin, Python distribution, command, MCP server, dataset, and configuration. Python requirements use PEP 440, such as <code>==3.11.0</code>. Plugin ranges use space-separated SemVer comparisons, such as <code>&gt;=0.5.0 &lt;0.6.0</code>. An MCP dependency can reference the ID of its declared provider plugin.</p>
+        <p>Doctor can report ready, unavailable, or unknown. A metadata check establishes what it can observe about declarations and prerequisites. Check the report’s evidence for runtime probes, and verify actual enablement in the host. Runtime probes are opt-in and require an explicit profile.</p>
+        <h3>Machine-readable contracts</h3>
+        <p>These schemas ship with the 0.5.1 tooling. The exporter and validator also enforce rules across files and dependencies.</p>
+        <details><summary>Plugin manifest JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft OpenStudio SI plugin identity and dependency manifest 0.1&quot;,
+  &quot;description&quot;: &quot;Draft. Skills and MCP connections are discovered from standard plugin files. Repository provenance is resolved at release.&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;schema_version&quot;: {
+      &quot;const&quot;: &quot;0.1&quot;
+    },
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+    },
+    &quot;name&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;description&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;version&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;pattern&quot;: &quot;^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$&quot;
+    },
+    &quot;owner&quot;: {
+      &quot;$ref&quot;: &quot;#/$defs/owner&quot;
+    },
+    &quot;contributors&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/$defs/person&quot;
+      }
+    },
+    &quot;license&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;compatibility&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;harness_api&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        }
+      },
+      &quot;required&quot;: [
+        &quot;harness_api&quot;
+      ]
+    },
+    &quot;inventory&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;skill_count&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 0
+        },
+        &quot;mcp_server_count&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 0
+        }
+      },
+      &quot;required&quot;: [
+        &quot;skill_count&quot;,
+        &quot;mcp_server_count&quot;
+      ],
+      &quot;description&quot;: &quot;Optional summary. Export writes counts discovered from files; supplied counts must match.&quot;
+    },
+    &quot;dependencies&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/$defs/dependency&quot;
+      }
+    },
+    &quot;capabilities&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/$defs/capability&quot;
+      },
+      &quot;minItems&quot;: 1
+    },
+    &quot;evaluation&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;cases&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;pattern&quot;: &quot;^(?!/)(?!.*\\\\)(?!.*(^|/)\\.\\.(/|$)).+$&quot;
+        }
+      },
+      &quot;required&quot;: [
+        &quot;cases&quot;
+      ]
+    },
+    &quot;package&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;include&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;uniqueItems&quot;: true,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;minLength&quot;: 1
+          }
+        }
+      }
+    }
+  },
+  &quot;required&quot;: [
+    &quot;schema_version&quot;,
+    &quot;id&quot;,
+    &quot;name&quot;,
+    &quot;description&quot;,
+    &quot;version&quot;,
+    &quot;owner&quot;,
+    &quot;license&quot;,
+    &quot;compatibility&quot;,
+    &quot;dependencies&quot;,
+    &quot;capabilities&quot;,
+    &quot;evaluation&quot;
+  ],
+  &quot;$defs&quot;: {
+    &quot;person&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;name&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;github&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;contact&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        }
+      },
+      &quot;required&quot;: [
+        &quot;name&quot;
+      ]
+    },
+    &quot;owner&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;id&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+        },
+        &quot;organization&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;maintainers&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/$defs/person&quot;
+          },
+          &quot;minItems&quot;: 1
+        }
+      },
+      &quot;required&quot;: [
+        &quot;id&quot;,
+        &quot;organization&quot;,
+        &quot;maintainers&quot;
+      ]
+    },
+    &quot;dependency&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;id&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+        },
+        &quot;kind&quot;: {
+          &quot;enum&quot;: [
+            &quot;plugin&quot;,
+            &quot;python-distribution&quot;,
+            &quot;command&quot;,
+            &quot;mcp-server&quot;,
+            &quot;dataset&quot;,
+            &quot;configuration&quot;
+          ]
+        },
+        &quot;target&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;version_spec&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;required&quot;: {
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;probe&quot;: {
+          &quot;enum&quot;: [
+            &quot;metadata&quot;,
+            &quot;command-version&quot;,
+            &quot;mcp-initialize&quot;,
+            &quot;mcp-tools&quot;,
+            &quot;dataset-metadata&quot;,
+            &quot;configuration-present&quot;
+          ]
+        },
+        &quot;install_hint&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;provider&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;description&quot;: &quot;ID of a declared plugin dependency providing this MCP server.&quot;
+        }
+      },
+      &quot;required&quot;: [
+        &quot;id&quot;,
+        &quot;kind&quot;,
+        &quot;target&quot;,
+        &quot;required&quot;,
+        &quot;probe&quot;
+      ]
+    },
+    &quot;capability&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;id&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+        },
+        &quot;name&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;description&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;requires&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+          },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;optional&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+          },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;effects&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;enum&quot;: [
+              &quot;read-data&quot;,
+              &quot;read-model&quot;,
+              &quot;write-model&quot;,
+              &quot;simulate&quot;,
+              &quot;network&quot;,
+              &quot;write-artifact&quot;
+            ]
+          },
+          &quot;uniqueItems&quot;: true
+        }
+      },
+      &quot;required&quot;: [
+        &quot;id&quot;,
+        &quot;name&quot;,
+        &quot;description&quot;,
+        &quot;requires&quot;,
+        &quot;effects&quot;
+      ]
+    }
+  }
+}</code></pre></details>
+<details><summary>Doctor runtime profile JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft selected-runtime profile 0.1&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;required&quot;: [&quot;schema_version&quot;, &quot;host&quot;, &quot;runtimes&quot;, &quot;bindings&quot;],
+  &quot;properties&quot;: {
+    &quot;schema_version&quot;: {&quot;const&quot;: &quot;0.1&quot;},
+    &quot;host&quot;: {&quot;enum&quot;: [&quot;claude&quot;, &quot;codex&quot;]},
+    &quot;runtimes&quot;: {
+      &quot;type&quot;: &quot;object&quot;, &quot;minProperties&quot;: 1,
+      &quot;propertyNames&quot;: {&quot;pattern&quot;: &quot;^[a-z][a-z0-9-]*$&quot;},
+      &quot;additionalProperties&quot;: {
+        &quot;type&quot;: &quot;object&quot;, &quot;additionalProperties&quot;: false,
+        &quot;required&quot;: [&quot;cwd&quot;, &quot;path&quot;, &quot;env&quot;],
+        &quot;properties&quot;: {
+          &quot;python&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1},
+          &quot;cwd&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1},
+          &quot;path&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;uniqueItems&quot;: true, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1}},
+          &quot;metadata_paths&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;minItems&quot;: 1, &quot;uniqueItems&quot;: true, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1}, &quot;description&quot;: &quot;Optional explicit package metadata directories, including user-site/PYTHONPATH locations; no startup hooks are executed.&quot;},
+          &quot;env&quot;: {
+            &quot;type&quot;: &quot;object&quot;, &quot;propertyNames&quot;: {&quot;pattern&quot;: &quot;^[A-Za-z_][A-Za-z0-9_]*$&quot;},
+            &quot;additionalProperties&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;pattern&quot;: &quot;^[A-Za-z_][A-Za-z0-9_]*$&quot;},
+            &quot;description&quot;: &quot;Destination variable names mapped to source variable NAMES, never literal values. PATH is supplied by path instead.&quot;
+          }
+        }
+      }
+    },
+    &quot;bindings&quot;: {
+      &quot;type&quot;: &quot;array&quot;, &quot;minItems&quot;: 1,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;, &quot;additionalProperties&quot;: false,
+        &quot;required&quot;: [&quot;plugin&quot;, &quot;dependency&quot;, &quot;runtime&quot;],
+        &quot;properties&quot;: {
+          &quot;plugin&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;pattern&quot;: &quot;^[a-z][a-z0-9-]*$&quot;},
+          &quot;dependency&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;pattern&quot;: &quot;^[a-z][a-z0-9-]*$&quot;},
+          &quot;runtime&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1},
+          &quot;allow_command_version&quot;: {&quot;type&quot;: &quot;boolean&quot;, &quot;default&quot;: false},
+          &quot;version_format&quot;: {&quot;enum&quot;: [&quot;semver&quot;, &quot;dash-build&quot;], &quot;description&quot;: &quot;dash-build normalizes a vendor release-hash token to release+hash; semver preserves prereleases.&quot;},
+          &quot;allow_mcp_initialize&quot;: {&quot;type&quot;: &quot;boolean&quot;, &quot;default&quot;: false},
+          &quot;required_tools&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;uniqueItems&quot;: true, &quot;maxItems&quot;: 1000, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 256}},
+          &quot;allow_dataset_metadata&quot;: {&quot;type&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;description&quot;: &quot;Trust the selected command to execute --si-dataset-metadata without starting a service.&quot;},
+          &quot;dataset_mcp&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;pattern&quot;: &quot;^[a-z][a-z0-9-]*$&quot;, &quot;description&quot;: &quot;ID of an MCP dependency whose declaration, arguments, environment and executable override are reused for dataset metadata.&quot;},
+          &quot;dataset_command&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;pattern&quot;: &quot;^[a-z][a-z0-9-]*$&quot;, &quot;description&quot;: &quot;ID of a command dependency in the same plugin. The selected executable is called with only --si-dataset-metadata.&quot;}
+        }
+      }
+    },
+    &quot;limits&quot;: {
+      &quot;type&quot;: &quot;object&quot;, &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;timeout_seconds&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;minimum&quot;: 0.1, &quot;maximum&quot;: 60},
+        &quot;total_seconds&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;minimum&quot;: 0.1, &quot;maximum&quot;: 300},
+        &quot;max_output_bytes&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 256, &quot;maximum&quot;: 4194304}
+      }
+    }
+  }
+}</code></pre></details>
+<details><summary>Evaluation case JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft OpenStudio SI plugin agent evaluation case 0.1&quot;,
+  &quot;description&quot;: &quot;Draft SI tasks and evidence requirements mapped to DeepEval LLMTestCase and configurable G-Eval metrics. Cases without judge metrics run observable checks only.&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;schema_version&quot;: {
+      &quot;const&quot;: &quot;0.1&quot;
+    },
+    &quot;case_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;pattern&quot;: &quot;^[a-z][a-z0-9_-]*$&quot;
+    },
+    &quot;description&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 4096
+    },
+    &quot;prompt&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 100000
+    },
+    &quot;inputs&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1,
+        &quot;pattern&quot;: &quot;^(?!/)(?!.*\\\\)(?!.*(^|/)\\.\\.(/|$)).+$&quot;
+      },
+      &quot;uniqueItems&quot;: true
+    },
+    &quot;arms&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      },
+      &quot;minItems&quot;: 1,
+      &quot;uniqueItems&quot;: true
+    },
+    &quot;required_tools&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/$defs/tool&quot;
+      }
+    },
+    &quot;forbidden_tools&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      }
+    },
+    &quot;required_skills&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      }
+    },
+    &quot;forbidden_skills&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      }
+    },
+    &quot;expected_tools_ordered&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      }
+    },
+    &quot;arm_routing&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: false,
+        &quot;properties&quot;: {
+          &quot;required_tools&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {
+              &quot;$ref&quot;: &quot;#/$defs/tool&quot;
+            }
+          },
+          &quot;forbidden_tools&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;minLength&quot;: 1
+            }
+          },
+          &quot;required_skills&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;minLength&quot;: 1
+            }
+          },
+          &quot;forbidden_skills&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;minLength&quot;: 1
+            }
+          }
+        },
+        &quot;required&quot;: []
+      }
+    },
+    &quot;expected&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;artifacts&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;minLength&quot;: 1
+          }
+        },
+        &quot;metrics&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;additionalProperties&quot;: false,
+            &quot;properties&quot;: {
+              &quot;name&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;minLength&quot;: 1
+              },
+              &quot;value&quot;: {
+                &quot;type&quot;: &quot;number&quot;
+              },
+              &quot;tolerance_pct&quot;: {
+                &quot;type&quot;: &quot;number&quot;,
+                &quot;minimum&quot;: 0
+              }
+            },
+            &quot;required&quot;: [
+              &quot;name&quot;,
+              &quot;value&quot;,
+              &quot;tolerance_pct&quot;
+            ]
+          }
+        },
+        &quot;model&quot;: {
+          &quot;type&quot;: &quot;object&quot;,
+          &quot;additionalProperties&quot;: false,
+          &quot;properties&quot;: {
+            &quot;version_min&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;minLength&quot;: 1
+            },
+            &quot;counts&quot;: {
+              &quot;type&quot;: &quot;object&quot;,
+              &quot;additionalProperties&quot;: {
+                &quot;type&quot;: &quot;integer&quot;,
+                &quot;minimum&quot;: 0
+              }
+            },
+            &quot;min_counts&quot;: {
+              &quot;type&quot;: &quot;object&quot;,
+              &quot;additionalProperties&quot;: {
+                &quot;type&quot;: &quot;integer&quot;,
+                &quot;minimum&quot;: 0
+              }
+            },
+            &quot;fields&quot;: {
+              &quot;type&quot;: &quot;array&quot;,
+              &quot;items&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;additionalProperties&quot;: false,
+                &quot;properties&quot;: {
+                  &quot;type&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;minLength&quot;: 1
+                  },
+                  &quot;field&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;minLength&quot;: 1
+                  },
+                  &quot;equals&quot;: {
+                    &quot;type&quot;: [
+                      &quot;string&quot;,
+                      &quot;number&quot;,
+                      &quot;boolean&quot;,
+                      &quot;null&quot;
+                    ]
+                  },
+                  &quot;contains&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;minLength&quot;: 1
+                  },
+                  &quot;match&quot;: {
+                    &quot;enum&quot;: [
+                      &quot;all&quot;,
+                      &quot;any&quot;
+                    ]
+                  }
+                },
+                &quot;required&quot;: [
+                  &quot;type&quot;,
+                  &quot;field&quot;
+                ],
+                &quot;oneOf&quot;: [
+                  {
+                    &quot;required&quot;: [
+                      &quot;equals&quot;
+                    ],
+                    &quot;not&quot;: {
+                      &quot;required&quot;: [
+                        &quot;contains&quot;
+                      ]
+                    }
+                  },
+                  {
+                    &quot;required&quot;: [
+                      &quot;contains&quot;
+                    ],
+                    &quot;not&quot;: {
+                      &quot;required&quot;: [
+                        &quot;equals&quot;
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            &quot;path&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;minLength&quot;: 1,
+              &quot;pattern&quot;: &quot;^(?!/)(?!.*\\\\)(?!.*(^|/)\\.\\.(/|$)).+$&quot;
+            }
+          },
+          &quot;required&quot;: []
+        },
+        &quot;reference&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;pattern&quot;: &quot;^(?!/)(?!.*\\\\)(?!.*(^|/)\\.\\.(/|$)).+$&quot;
+        },
+        &quot;output&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 8192
+        }
+      },
+      &quot;required&quot;: []
+    },
+    &quot;judge&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;framework&quot;: {
+          &quot;const&quot;: &quot;deepeval&quot;
+        },
+        &quot;metrics&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;additionalProperties&quot;: false,
+            &quot;properties&quot;: {
+              &quot;id&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;pattern&quot;: &quot;^[a-z][a-z0-9]*(-[a-z0-9]+)*$&quot;
+              },
+              &quot;name&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;minLength&quot;: 1,
+                &quot;maxLength&quot;: 8192
+              },
+              &quot;type&quot;: {
+                &quot;const&quot;: &quot;geval&quot;
+              },
+              &quot;criteria&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;minLength&quot;: 1,
+                &quot;maxLength&quot;: 8192
+              },
+              &quot;evaluation_steps&quot;: {
+                &quot;type&quot;: &quot;array&quot;,
+                &quot;items&quot;: {
+                  &quot;type&quot;: &quot;string&quot;,
+                  &quot;minLength&quot;: 1,
+                  &quot;maxLength&quot;: 8192
+                },
+                &quot;minItems&quot;: 1,
+                &quot;maxItems&quot;: 100
+              },
+              &quot;evaluation_params&quot;: {
+                &quot;type&quot;: &quot;array&quot;,
+                &quot;items&quot;: {
+                  &quot;enum&quot;: [
+                    &quot;input&quot;,
+                    &quot;actual_output&quot;,
+                    &quot;expected_output&quot;,
+                    &quot;context&quot;,
+                    &quot;retrieval_context&quot;,
+                    &quot;tools_called&quot;,
+                    &quot;expected_tools&quot;
+                  ]
+                },
+                &quot;minItems&quot;: 1,
+                &quot;uniqueItems&quot;: true
+              },
+              &quot;weight&quot;: {
+                &quot;type&quot;: &quot;number&quot;,
+                &quot;exclusiveMinimum&quot;: 0,
+                &quot;maximum&quot;: 1000000
+              },
+              &quot;threshold&quot;: {
+                &quot;type&quot;: &quot;number&quot;,
+                &quot;minimum&quot;: 0,
+                &quot;maximum&quot;: 1
+              },
+              &quot;strict_mode&quot;: {
+                &quot;type&quot;: &quot;boolean&quot;
+              },
+              &quot;top_logprobs&quot;: {
+                &quot;type&quot;: &quot;integer&quot;,
+                &quot;minimum&quot;: 1,
+                &quot;maximum&quot;: 20
+              },
+              &quot;rubric&quot;: {
+                &quot;type&quot;: &quot;array&quot;,
+                &quot;minItems&quot;: 1,
+                &quot;maxItems&quot;: 11,
+                &quot;items&quot;: {
+                  &quot;type&quot;: &quot;object&quot;,
+                  &quot;additionalProperties&quot;: false,
+                  &quot;properties&quot;: {
+                    &quot;score_range&quot;: {
+                      &quot;type&quot;: &quot;array&quot;,
+                      &quot;items&quot;: {
+                        &quot;type&quot;: &quot;integer&quot;,
+                        &quot;minimum&quot;: 0,
+                        &quot;maximum&quot;: 10
+                      },
+                      &quot;minItems&quot;: 2,
+                      &quot;maxItems&quot;: 2
+                    },
+                    &quot;expected_outcome&quot;: {
+                      &quot;type&quot;: &quot;string&quot;,
+                      &quot;minLength&quot;: 1,
+                      &quot;maxLength&quot;: 8192
+                    }
+                  },
+                  &quot;required&quot;: [
+                    &quot;score_range&quot;,
+                    &quot;expected_outcome&quot;
+                  ]
+                }
+              },
+              &quot;required_artifacts&quot;: {
+                &quot;type&quot;: &quot;array&quot;,
+                &quot;items&quot;: {
+                  &quot;type&quot;: &quot;string&quot;,
+                  &quot;minLength&quot;: 1
+                },
+                &quot;uniqueItems&quot;: true
+              }
+            },
+            &quot;required&quot;: [
+              &quot;id&quot;,
+              &quot;type&quot;,
+              &quot;evaluation_params&quot;
+            ],
+            &quot;oneOf&quot;: [
+              {
+                &quot;required&quot;: [
+                  &quot;criteria&quot;
+                ],
+                &quot;not&quot;: {
+                  &quot;required&quot;: [
+                    &quot;evaluation_steps&quot;
+                  ]
+                }
+              },
+              {
+                &quot;required&quot;: [
+                  &quot;evaluation_steps&quot;
+                ],
+                &quot;not&quot;: {
+                  &quot;required&quot;: [
+                    &quot;criteria&quot;
+                  ]
+                }
+              }
+            ]
+          },
+          &quot;minItems&quot;: 1,
+          &quot;maxItems&quot;: 100
+        },
+        &quot;threshold&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 0,
+          &quot;maximum&quot;: 1
+        }
+      },
+      &quot;required&quot;: [
+        &quot;framework&quot;,
+        &quot;metrics&quot;,
+        &quot;threshold&quot;
+      ]
+    },
+    &quot;context&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1,
+        &quot;maxLength&quot;: 8192
+      },
+      &quot;minItems&quot;: 1,
+      &quot;maxItems&quot;: 100
+    },
+    &quot;retrieval_context&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1,
+        &quot;maxLength&quot;: 8192
+      },
+      &quot;minItems&quot;: 1,
+      &quot;maxItems&quot;: 100
+    }
+  },
+  &quot;required&quot;: [
+    &quot;schema_version&quot;,
+    &quot;case_id&quot;,
+    &quot;description&quot;,
+    &quot;prompt&quot;,
+    &quot;inputs&quot;
+  ],
+  &quot;$defs&quot;: {
+    &quot;tool&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;tool&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;provider&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        }
+      },
+      &quot;required&quot;: [
+        &quot;tool&quot;
+      ]
+    }
+  }
+}</code></pre></details>
+<details><summary>Evaluation run configuration JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft OpenStudio SI evaluation-run 0.1&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;schema_version&quot;: {
+      &quot;const&quot;: &quot;0.1&quot;
+    },
+    &quot;host&quot;: {
+      &quot;enum&quot;: [
+        &quot;claude&quot;,
+        &quot;codex&quot;
+      ]
+    },
+    &quot;agent&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;model&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;command&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;api_key_env&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[A-Z_][A-Z0-9_]*$&quot;
+        },
+        &quot;base_url&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;agent&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;allowed_tools&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;minLength&quot;: 1
+          },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;env&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;pattern&quot;: &quot;^[A-Z_][A-Z0-9_]*$&quot;
+          },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;sandbox&quot;: {
+          &quot;enum&quot;: [
+            &quot;read-only&quot;,
+            &quot;workspace-write&quot;
+          ]
+        }
+      },
+      &quot;required&quot;: [
+        &quot;model&quot;
+      ]
+    },
+    &quot;judge&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;framework&quot;: {
+          &quot;const&quot;: &quot;deepeval&quot;
+        },
+        &quot;provider&quot;: {
+          &quot;enum&quot;: [
+            &quot;openai&quot;,
+            &quot;azure-openai&quot;,
+            &quot;anthropic&quot;,
+            &quot;gemini&quot;,
+            &quot;ollama&quot;,
+            &quot;openai-compatible&quot;
+          ]
+        },
+        &quot;model&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 8192
+        },
+        &quot;api_key_env&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[A-Z_][A-Z0-9_]*$&quot;
+        },
+        &quot;base_url&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 8192
+        },
+        &quot;deployment_name&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 8192
+        },
+        &quot;api_version&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 8192
+        },
+        &quot;temperature&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 0,
+          &quot;maximum&quot;: 2
+        },
+        &quot;max_output_tokens&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 64,
+          &quot;maximum&quot;: 8192
+        },
+        &quot;geval&quot;: {
+          &quot;type&quot;: &quot;object&quot;,
+          &quot;additionalProperties&quot;: false,
+          &quot;properties&quot;: {
+            &quot;threshold&quot;: {
+              &quot;type&quot;: &quot;number&quot;,
+              &quot;minimum&quot;: 0,
+              &quot;maximum&quot;: 1
+            },
+            &quot;strict_mode&quot;: {
+              &quot;type&quot;: &quot;boolean&quot;
+            },
+            &quot;top_logprobs&quot;: {
+              &quot;type&quot;: &quot;integer&quot;,
+              &quot;minimum&quot;: 1,
+              &quot;maximum&quot;: 20
+            }
+          },
+          &quot;required&quot;: []
+        }
+      },
+      &quot;required&quot;: [
+        &quot;framework&quot;,
+        &quot;provider&quot;,
+        &quot;model&quot;
+      ],
+      &quot;allOf&quot;: [
+        {
+          &quot;if&quot;: {
+            &quot;properties&quot;: {
+              &quot;provider&quot;: {
+                &quot;const&quot;: &quot;ollama&quot;
+              }
+            }
+          },
+          &quot;then&quot;: {
+            &quot;not&quot;: {
+              &quot;required&quot;: [
+                &quot;api_key_env&quot;
+              ]
+            }
+          },
+          &quot;else&quot;: {
+            &quot;required&quot;: [
+              &quot;api_key_env&quot;
+            ]
+          }
+        },
+        {
+          &quot;if&quot;: {
+            &quot;properties&quot;: {
+              &quot;provider&quot;: {
+                &quot;const&quot;: &quot;azure-openai&quot;
+              }
+            }
+          },
+          &quot;then&quot;: {
+            &quot;required&quot;: [
+              &quot;base_url&quot;,
+              &quot;deployment_name&quot;,
+              &quot;api_version&quot;
+            ]
+          },
+          &quot;else&quot;: {
+            &quot;not&quot;: {
+              &quot;anyOf&quot;: [
+                {
+                  &quot;required&quot;: [
+                    &quot;deployment_name&quot;
+                  ]
+                },
+                {
+                  &quot;required&quot;: [
+                    &quot;api_version&quot;
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          &quot;if&quot;: {
+            &quot;properties&quot;: {
+              &quot;provider&quot;: {
+                &quot;const&quot;: &quot;openai-compatible&quot;
+              }
+            }
+          },
+          &quot;then&quot;: {
+            &quot;required&quot;: [
+              &quot;base_url&quot;
+            ]
+          }
+        },
+        {
+          &quot;if&quot;: {
+            &quot;properties&quot;: {
+              &quot;provider&quot;: {
+                &quot;const&quot;: &quot;gemini&quot;
+              }
+            }
+          },
+          &quot;then&quot;: {
+            &quot;not&quot;: {
+              &quot;required&quot;: [
+                &quot;base_url&quot;
+              ]
+            }
+          }
+        }
+      ]
+    },
+    &quot;plugins&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      },
+      &quot;uniqueItems&quot;: true,
+      &quot;minItems&quot;: 1
+    },
+    &quot;arms&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;minProperties&quot;: 1,
+      &quot;propertyNames&quot;: {
+        &quot;pattern&quot;: &quot;^[a-z][a-z0-9_-]*$&quot;
+      },
+      &quot;additionalProperties&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: false,
+        &quot;properties&quot;: {
+          &quot;plugins&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;minLength&quot;: 1
+            },
+            &quot;uniqueItems&quot;: true
+          }
+        },
+        &quot;required&quot;: [
+          &quot;plugins&quot;
+        ]
+      }
+    },
+    &quot;repeat&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;minimum&quot;: 1,
+      &quot;maximum&quot;: 20
+    },
+    &quot;limits&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;case_timeout_seconds&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 1,
+          &quot;maximum&quot;: 7200
+        },
+        &quot;judge_timeout_seconds&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 1,
+          &quot;maximum&quot;: 600
+        },
+        &quot;run_timeout_seconds&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 1,
+          &quot;maximum&quot;: 86400
+        },
+        &quot;max_sessions&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 1,
+          &quot;maximum&quot;: 1000
+        },
+        &quot;max_trace_bytes&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 1024,
+          &quot;maximum&quot;: 100000000
+        },
+        &quot;max_artifact_bytes&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 1024,
+          &quot;maximum&quot;: 100000000
+        },
+        &quot;max_evidence_chars&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 1024,
+          &quot;maximum&quot;: 1000000
+        },
+        &quot;max_cost_usd&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 0.01,
+          &quot;maximum&quot;: 1000
+        }
+      },
+      &quot;required&quot;: []
+    }
+  },
+  &quot;required&quot;: [
+    &quot;schema_version&quot;,
+    &quot;host&quot;,
+    &quot;agent&quot;,
+    &quot;plugins&quot;
+  ]
+}</code></pre></details>
+<details><summary>Judge configuration JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft OpenStudio SI evaluation-judge-config 0.1&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;framework&quot;: {
+      &quot;const&quot;: &quot;deepeval&quot;
+    },
+    &quot;provider&quot;: {
+      &quot;enum&quot;: [
+        &quot;openai&quot;,
+        &quot;azure-openai&quot;,
+        &quot;anthropic&quot;,
+        &quot;gemini&quot;,
+        &quot;ollama&quot;,
+        &quot;openai-compatible&quot;
+      ]
+    },
+    &quot;model&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 8192
+    },
+    &quot;api_key_env&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;pattern&quot;: &quot;^[A-Z_][A-Z0-9_]*$&quot;
+    },
+    &quot;base_url&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 8192
+    },
+    &quot;deployment_name&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 8192
+    },
+    &quot;api_version&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 8192
+    },
+    &quot;temperature&quot;: {
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;minimum&quot;: 0,
+      &quot;maximum&quot;: 2
+    },
+    &quot;max_output_tokens&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;minimum&quot;: 64,
+      &quot;maximum&quot;: 8192
+    },
+    &quot;geval&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;threshold&quot;: {
+          &quot;type&quot;: &quot;number&quot;,
+          &quot;minimum&quot;: 0,
+          &quot;maximum&quot;: 1
+        },
+        &quot;strict_mode&quot;: {
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;top_logprobs&quot;: {
+          &quot;type&quot;: &quot;integer&quot;,
+          &quot;minimum&quot;: 1,
+          &quot;maximum&quot;: 20
+        }
+      },
+      &quot;required&quot;: []
+    }
+  },
+  &quot;required&quot;: [
+    &quot;framework&quot;,
+    &quot;provider&quot;,
+    &quot;model&quot;
+  ],
+  &quot;allOf&quot;: [
+    {
+      &quot;if&quot;: {
+        &quot;properties&quot;: {
+          &quot;provider&quot;: {
+            &quot;const&quot;: &quot;ollama&quot;
+          }
+        }
+      },
+      &quot;then&quot;: {
+        &quot;not&quot;: {
+          &quot;required&quot;: [
+            &quot;api_key_env&quot;
+          ]
+        }
+      },
+      &quot;else&quot;: {
+        &quot;required&quot;: [
+          &quot;api_key_env&quot;
+        ]
+      }
+    },
+    {
+      &quot;if&quot;: {
+        &quot;properties&quot;: {
+          &quot;provider&quot;: {
+            &quot;const&quot;: &quot;azure-openai&quot;
+          }
+        }
+      },
+      &quot;then&quot;: {
+        &quot;required&quot;: [
+          &quot;base_url&quot;,
+          &quot;deployment_name&quot;,
+          &quot;api_version&quot;
+        ]
+      },
+      &quot;else&quot;: {
+        &quot;not&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;required&quot;: [
+                &quot;deployment_name&quot;
+              ]
+            },
+            {
+              &quot;required&quot;: [
+                &quot;api_version&quot;
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      &quot;if&quot;: {
+        &quot;properties&quot;: {
+          &quot;provider&quot;: {
+            &quot;const&quot;: &quot;openai-compatible&quot;
+          }
+        }
+      },
+      &quot;then&quot;: {
+        &quot;required&quot;: [
+          &quot;base_url&quot;
+        ]
+      }
+    },
+    {
+      &quot;if&quot;: {
+        &quot;properties&quot;: {
+          &quot;provider&quot;: {
+            &quot;const&quot;: &quot;gemini&quot;
+          }
+        }
+      },
+      &quot;then&quot;: {
+        &quot;not&quot;: {
+          &quot;required&quot;: [
+            &quot;base_url&quot;
+          ]
+        }
+      }
+    }
+  ]
+}</code></pre></details>
+<details><summary>Evaluation result JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft OpenStudio SI evaluation-result 0.1&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;schema_version&quot;: {
+      &quot;const&quot;: &quot;0.1&quot;
+    },
+    &quot;session_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;case&quot;: {
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;case_hash&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;legacy_routing&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    },
+    &quot;arm&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;repeat&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;minimum&quot;: 1
+    },
+    &quot;host&quot;: {
+      &quot;enum&quot;: [
+        &quot;claude&quot;,
+        &quot;codex&quot;
+      ]
+    },
+    &quot;agent&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;model&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;command&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;api_key_env&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[A-Z_][A-Z0-9_]*$&quot;
+        },
+        &quot;base_url&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;agent&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1
+        },
+        &quot;allowed_tools&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;minLength&quot;: 1
+          },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;env&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;pattern&quot;: &quot;^[A-Z_][A-Z0-9_]*$&quot;
+          },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;sandbox&quot;: {
+          &quot;enum&quot;: [
+            &quot;read-only&quot;,
+            &quot;workspace-write&quot;
+          ]
+        }
+      },
+      &quot;required&quot;: [
+        &quot;model&quot;
+      ]
+    },
+    &quot;plugins&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;
+      }
+    },
+    &quot;host_version&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1
+    },
+    &quot;status&quot;: {
+      &quot;enum&quot;: [
+        &quot;passed&quot;,
+        &quot;failed&quot;,
+        &quot;incomplete&quot;
+      ]
+    },
+    &quot;checks&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;
+      }
+    },
+    &quot;gaps&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      }
+    },
+    &quot;usage&quot;: {
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;evidence_hashes&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 1
+      }
+    },
+    &quot;judge&quot;: {
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;warnings&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: false,
+        &quot;properties&quot;: {
+          &quot;code&quot;: {&quot;const&quot;: &quot;reference_text_match&quot;},
+          &quot;confidence&quot;: {&quot;enum&quot;: [&quot;low&quot;, &quot;medium&quot;]},
+          &quot;locations&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}, &quot;minItems&quot;: 1},
+          &quot;message&quot;: {&quot;type&quot;: &quot;string&quot;}
+        },
+        &quot;required&quot;: [&quot;code&quot;, &quot;confidence&quot;, &quot;locations&quot;, &quot;message&quot;]
+      }
+    },
+    &quot;notes&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      }
+    },
+    &quot;capabilities&quot;: {
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;environment_names&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      }
+    },
+    &quot;holdout_pending&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;schema_version&quot;,
+    &quot;session_id&quot;,
+    &quot;case&quot;,
+    &quot;case_hash&quot;,
+    &quot;legacy_routing&quot;,
+    &quot;arm&quot;,
+    &quot;repeat&quot;,
+    &quot;host&quot;,
+    &quot;agent&quot;,
+    &quot;plugins&quot;,
+    &quot;host_version&quot;,
+    &quot;status&quot;,
+    &quot;checks&quot;,
+    &quot;gaps&quot;,
+    &quot;usage&quot;,
+    &quot;evidence_hashes&quot;,
+    &quot;judge&quot;
+  ]
+}</code></pre></details>
+<details><summary>Dataset metadata JSON Schema</summary><pre tabindex="0"><code>{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;title&quot;: &quot;Draft read-only dataset identity 0.1&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;additionalProperties&quot;: false,
+  &quot;required&quot;: [
+    &quot;schema_version&quot;,
+    &quot;dataset&quot;,
+    &quot;version&quot;,
+    &quot;package&quot;,
+    &quot;packaged_data&quot;,
+    &quot;cache&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;schema_version&quot;: {
+      &quot;const&quot;: &quot;0.1&quot;
+    },
+    &quot;dataset&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 256
+    },
+    &quot;version&quot;: {
+      &quot;type&quot;: [
+        &quot;string&quot;,
+        &quot;null&quot;
+      ],
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 256
+    },
+    &quot;package&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;required&quot;: [
+        &quot;name&quot;,
+        &quot;version&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;name&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 256
+        },
+        &quot;version&quot;: {
+          &quot;type&quot;: [
+            &quot;string&quot;,
+            &quot;null&quot;
+          ],
+          &quot;minLength&quot;: 1,
+          &quot;maxLength&quot;: 256
+        }
+      }
+    },
+    &quot;packaged_data&quot;: {
+      &quot;oneOf&quot;: [
+        {
+          &quot;type&quot;: &quot;null&quot;
+        },
+        {
+          &quot;type&quot;: &quot;object&quot;,
+          &quot;additionalProperties&quot;: false,
+          &quot;required&quot;: [
+            &quot;algorithm&quot;,
+            &quot;sha256&quot;,
+            &quot;files&quot;
+          ],
+          &quot;properties&quot;: {
+            &quot;algorithm&quot;: {
+              &quot;const&quot;: &quot;sha256-path-content-v1&quot;
+            },
+            &quot;sha256&quot;: {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;pattern&quot;: &quot;^[0-9a-f]{64}$&quot;
+            },
+            &quot;files&quot;: {
+              &quot;type&quot;: &quot;integer&quot;,
+              &quot;minimum&quot;: 1
+            }
+          }
+        }
+      ]
+    },
+    &quot;cache&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;required&quot;: [
+        &quot;selection&quot;,
+        &quot;state&quot;,
+        &quot;sha256&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;selection&quot;: {
+          &quot;enum&quot;: [
+            &quot;argument&quot;,
+            &quot;environment&quot;,
+            &quot;default&quot;
+          ]
+        },
+        &quot;state&quot;: {
+          &quot;enum&quot;: [
+            &quot;missing&quot;,
+            &quot;ready&quot;,
+            &quot;unreadable&quot;,
+            &quot;invalid&quot;,
+            &quot;changing&quot;,
+            &quot;wal_present&quot;
+          ]
+        },
+        &quot;sha256&quot;: {
+          &quot;oneOf&quot;: [
+            {
+              &quot;type&quot;: &quot;null&quot;
+            },
+            {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;pattern&quot;: &quot;^[0-9a-f]{64}$&quot;
+            }
+          ]
+        },
+        &quot;source_data_sha256&quot;: {
+          &quot;oneOf&quot;: [
+            {
+              &quot;type&quot;: &quot;null&quot;
+            },
+            {
+              &quot;type&quot;: &quot;string&quot;,
+              &quot;pattern&quot;: &quot;^[0-9a-f]{64}$&quot;
+            }
+          ],
+          &quot;description&quot;: &quot;Packaged-data digest recorded when building this cache. Null/absent means unverified legacy provenance.&quot;
+        }
+      }
+    }
+  }
+}</code></pre></details>
+
+      </section>
+
+      <section id="walkthrough">
+        <h2>Walkthrough · Summarize an OSM model</h2>
+        <p>Start with the <code>osm-model-summary</code> project from the <a href="#quickstart">quickstart</a>. This example reports stories, spaces, zones, and HVAC inventory from a local OpenStudio model. It uses one skill and zero MCP servers.</p>
+        <h3 id="osm-skill">Add the skill and script</h3>
+        <pre tabindex="0"><code>mv plugin/skills/osm-model-summary plugin/skills/summarize-osm
+mkdir -p plugin/skills/summarize-osm/scripts</code></pre>
+        <p>Replace <code>plugin/skills/summarize-osm/SKILL.md</code> with the following.</p>
+        <pre tabindex="0"><code>---
+name: summarize-osm
+description: Inspect a local OpenStudio OSM and report model inventory without editing or simulating it.
+---
+
+Use this skill when the user asks what an OSM contains or requests a model summary.
+
+1. Identify the exact input .osm. If several files could be intended, ask which.
+2. Use the Python environment selected for this plugin. Run the bundled
+   `scripts/summarize_osm.py` with the model path as a quoted positional argument.
+   Resolve the script relative to this SKILL.md; do not depend on a developer&#x27;s
+   checkout path or write a replacement script.
+3. If the SDK is unavailable or loading fails, report the error and the required
+   SDK/environment. Do not treat a missing dependency as proof the model is corrupt.
+   Invalid inputs may produce native SDK diagnostics despite logger suppression;
+   treat exit code 2 as failure and do not try to parse that output as summary JSON.
+4. Read the JSON. Report the building name, object counts, spaces/zones and air/
+   plant loop names. Explain warnings and retain m² units for floor areas.
+5. State that inspection did not simulate, size, validate compliance or save the
+   model. Do not infer absent HVAC solely from an empty air-loop list.
+
+Do not edit or overwrite the input. Do not launch MCP servers or install packages
+as part of the summary. Do not silently switch to another model or SDK version.</code></pre>
+        <p>Save this script as <code>plugin/skills/summarize-osm/scripts/summarize_osm.py</code>.</p>
+        <pre tabindex="0"><code>&quot;&quot;&quot;Summarize an OSM without editing, saving or simulating it.&quot;&quot;&quot;
+
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+
+def summarize(path):
+    import openstudio
+
+    if openstudio.openStudioVersion() != &quot;3.11.0&quot;:
+        raise ValueError(&quot;This plugin requires OpenStudio SDK 3.11.0.&quot;)
+    path = path.expanduser().resolve(strict=True)
+    if not path.is_file() or path.suffix.lower() != &quot;.osm&quot;:
+        raise ValueError(&quot;Select an existing .osm file.&quot;)
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    openstudio.Logger.instance().standardOutLogger().disable()
+    translator = openstudio.osversion.VersionTranslator()
+    loaded = translator.loadModel(openstudio.path(str(path)))
+    if not loaded.is_initialized():
+        raise ValueError(&quot;The selected SDK could not load this model.&quot;)
+    model = loaded.get()
+    spaces = sorted(model.getSpaces(), key=lambda item: item.nameString())
+    zones = sorted(model.getThermalZones(), key=lambda item: item.nameString())
+    air_loops = sorted(model.getAirLoopHVACs(), key=lambda item: item.nameString())
+    unassigned = [space.nameString() for space in spaces if not space.thermalZone().is_initialized()]
+    warnings = []
+    if not spaces:
+        warnings.append(&quot;The model contains no spaces.&quot;)
+    if unassigned:
+        warnings.append(&quot;Some spaces are not assigned to thermal zones.&quot;)
+    if not air_loops:
+        warnings.append(&quot;No air loops were found; zone HVAC equipment may still exist.&quot;)
+    if hashlib.sha256(path.read_bytes()).hexdigest() != before:
+        raise ValueError(&quot;The input changed during inspection; rerun on a stable file.&quot;)
+    return {
+        &quot;format&quot;: &quot;openstudio-si-osm-summary/0.1&quot;,
+        &quot;input_name&quot;: path.name,
+        &quot;input_sha256&quot;: before,
+        &quot;sdk_version&quot;: openstudio.openStudioVersion(),
+        &quot;building_name&quot;: model.getBuilding().nameString(),
+        &quot;counts&quot;: {
+            &quot;stories&quot;: len(model.getBuildingStorys()),
+            &quot;spaces&quot;: len(spaces),
+            &quot;thermal_zones&quot;: len(zones),
+            &quot;air_loops&quot;: len(air_loops),
+            &quot;plant_loops&quot;: len(model.getPlantLoops()),
+            &quot;zone_hvac_equipment&quot;: sum(len(zone.equipment()) for zone in zones),
+        },
+        &quot;spaces&quot;: [
+            {&quot;name&quot;: space.nameString(), &quot;floor_area_m2&quot;: space.floorArea(),
+             &quot;thermal_zone&quot;: space.thermalZone().get().nameString() if space.thermalZone().is_initialized() else None}
+            for space in spaces
+        ],
+        &quot;zones&quot;: [zone.nameString() for zone in zones],
+        &quot;air_loops&quot;: [
+            {&quot;name&quot;: loop.nameString(), &quot;served_zones&quot;: sorted(zone.nameString() for zone in loop.thermalZones())}
+            for loop in air_loops
+        ],
+        &quot;plant_loops&quot;: sorted(loop.nameString() for loop in model.getPlantLoops()),
+        &quot;unassigned_spaces&quot;: unassigned,
+        &quot;warnings&quot;: warnings,
+        &quot;simulation_performed&quot;: False,
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(&quot;model&quot;, type=Path)
+    args = parser.parse_args()
+    try:
+        result = summarize(args.model)
+    except ImportError:
+        print(&quot;OpenStudio SDK unavailable: select the plugin&#x27;s Python environment.&quot;, file=sys.stderr)
+        return 2
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    print(json.dumps(result, indent=2, allow_nan=False))
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+        <h3>Declare the capability</h3>
+        <p>Replace <code>description</code>, <code>dependencies</code>, and <code>capabilities</code> in the generated manifest with the fields below. Keep the other fields, including your owner, version, and evaluation case path. Update the two starter READMEs to describe the summary skill.</p>
+        <pre tabindex="0"><code>description: Read-only inventory of a local OpenStudio model.
+dependencies:
+  - id: openstudio-sdk
+    kind: python-distribution
+    target: openstudio
+    version_spec: &quot;==3.11.0&quot;
+    required: true
+    probe: metadata
+    install_hint: Select the Python environment containing OpenStudio SDK 3.11.0.
+capabilities:
+  - id: summarize-osm
+    name: Summarize an OSM
+    description: Report model object counts and HVAC loop inventory without editing.
+    requires: [openstudio-sdk]
+    effects: [read-data]</code></pre>
+        <h3 id="osm-fixture">Build a fixture and evaluation case</h3>
+        <p>From the project root, create a small synthetic OSM. It has one story, two spaces, two thermal zones, and zero air and plant loops. It has no modeled floor geometry.</p>
+        <pre tabindex="0"><code>python - &lt;&lt;&#x27;PYTHON&#x27;
+from pathlib import Path
+import openstudio
+
+model = openstudio.model.Model()
+model.getBuilding().setName(&quot;Summary Demo&quot;)
+story = openstudio.model.BuildingStory(model)
+story.setName(&quot;Story 1&quot;)
+for number in (1, 2):
+    space = openstudio.model.Space(model)
+    space.setName(f&quot;Space {number}&quot;)
+    space.setBuildingStory(story)
+    zone = openstudio.model.ThermalZone(model)
+    zone.setName(f&quot;Zone {number}&quot;)
+    space.setThermalZone(zone)
+path = Path(&quot;plugin/evals/fixtures/two-zone.osm&quot;)
+path.parent.mkdir(parents=True, exist_ok=True)
+model.save(openstudio.path(str(path)), True)
+PYTHON</code></pre>
+        <pre tabindex="0"><code>python plugin/skills/summarize-osm/scripts/summarize_osm.py plugin/evals/fixtures/two-zone.osm</code></pre>
+        <p>Check the counts and confirm the input bytes are unchanged. Invalid or missing inputs should exit with code 2. Native SDK diagnostics can accompany invalid-input errors.</p>
+        <p>Remove the generated <code>plugin/evals/cases/layout-demo.json</code>, <code>plugin/evals/reference/layout.md</code>, and <code>plugin/evals/calibration/judge-injection-canary.json</code>. Save the following as <code>plugin/evals/cases/two-zone-summary.json</code>.</p>
+        <pre tabindex="0"><code>{
+  &quot;schema_version&quot;: &quot;0.1&quot;,
+  &quot;case_id&quot;: &quot;two-zone-summary&quot;,
+  &quot;description&quot;: &quot;Summarize the bundled inventory fixture without changing it.&quot;,
+  &quot;prompt&quot;: &quot;Use summarize-osm to inspect the supplied OSM. Report counts and limitations without editing or simulating.&quot;,
+  &quot;inputs&quot;: [&quot;evals/fixtures/two-zone.osm&quot;],
+  &quot;required_skills&quot;: [&quot;osm-model-summary:summarize-osm&quot;],
+  &quot;expected&quot;: {
+    &quot;output&quot;: &quot;One story, two spaces, two thermal zones, zero air loops and zero plant loops. No simulation or sizing was performed.&quot;
+  },
+  &quot;judge&quot;: {
+    &quot;framework&quot;: &quot;deepeval&quot;,
+    &quot;threshold&quot;: 0.8,
+    &quot;metrics&quot;: [{
+      &quot;id&quot;: &quot;inventory-accuracy&quot;,
+      &quot;type&quot;: &quot;geval&quot;,
+      &quot;evaluation_steps&quot;: [
+        &quot;Compare the reported counts with the expected output and the script evidence.&quot;,
+        &quot;Check that the answer distinguishes inventory from simulation readiness and avoids claiming that no air loops means no HVAC.&quot;,
+        &quot;Penalize invented sizing, energy use or compliance claims.&quot;
+      ],
+      &quot;evaluation_params&quot;: [&quot;input&quot;, &quot;actual_output&quot;, &quot;expected_output&quot;],
+      &quot;weight&quot;: 1,
+      &quot;threshold&quot;: 0.8
+    }]
+  }
+}</code></pre>
+        <p>The expected counts and synthetic fixture are public demo data. Release packages can include them. For local agent and judge evaluation, install <code>openstudio-si[eval]==0.5.1</code>, copy the generated <code>eval-run.example.yaml</code> to <code>eval-run.local.yaml</code>, and set the export paths, model suppliers, and credentials in your local runtime. On Claude, allow Bash for the bundled script. Keep local configuration with sensitive values out of Git. Judge scores are advisory.</p>
+        <h3 id="osm-test">Export and test in both hosts</h3>
+        <pre tabindex="0"><code>openstudio-si plugin check-project .
+openstudio-si plugin validate ./plugin
 mkdir -p dist
 openstudio-si plugin export ./plugin --host all --output ./dist/plugin \
   &gt; dist/export-report.json
 openstudio-si plugin check-hosts dist/export-report.json</code></pre>
-          <p>Confirm each export has one skill and zero MCP servers. The host check needs both CLIs. Load the appropriate export in your host and ask it to summarize the fixture. You can run an optional local agent evaluation. LLM scores are advisory and stay outside release CI.</p>
-        </section>
-        <section id="publish">
-          <h2>4. Submit a release</h2>
-          <ol>
-            <li>Push the project to your own public GitHub repository. Configure the template's workflows with <code>openstudio-si plugin configure-ci</code> using a reviewed harness commit SHA and an exact published tooling version.</li>
-            <li>Ask the marketplace maintainers to register your plugin ID, source repository, manifest owner, and plugin path.</li>
-            <li>Run <code>openstudio-si plugin check-project . --require-tracked</code> locally before tagging. Publish a stable GitHub release such as <code>v0.1.0</code> matching your manifest. The release workflow attaches <code>release.json</code> and both host archives.</li>
-            <li>Your repository publishes the release assets with its own GitHub permissions. Once the marketplace importer is enabled and your plugin is enrolled, central polling verifies the release and prepares a PR for maintainer review.</li>
-          </ol>
-          <p><a href="https://github.com/pnnl/openstudio-si-harness/blob/main/docs/PLUGIN_PUBLISHING.md#laboratory-workflow">Publishing and enrollment details</a></p>
-        </section>
-      </div>
-    </div>
-  </main>
-  <footer><div class="wrap"><a href="index.html">OpenStudio SI overview</a></div></footer>
+        <p>With both host CLIs available, check that the exports contain one skill and zero MCP servers. Load the appropriate export and ask the agent to summarize the fixture. Compare the agent’s counts and caveats with the script’s JSON. The case can also run through the evaluation CLI.</p>
+        <pre tabindex="0"><code>openstudio-si eval run --plugin ./plugin --cases ./plugin/evals/cases \
+  --config ./eval-run.local.yaml --output ./outputs/evals/run-001
+openstudio-si eval report --run ./outputs/evals/run-001</code></pre>
+      </section>
+
+      <section id="publish">
+        <h2>Release a plugin</h2>
+        <ol>
+          <li>Set up your public source repository on GitHub. Configure its reusable CI workflows using a reviewed full harness commit SHA and a published tooling version. Commit the generated workflow files.</li>
+          <li>Ask marketplace maintainers to enroll your plugin ID, source repository, owner ID, and plugin path.</li>
+          <li>Stage the intended files and run <code>openstudio-si plugin check-project . --require-tracked</code> locally. After conformance passes, publish a stable GitHub release with a tag that matches the manifest, such as <code>v0.1.0</code>.</li>
+          <li>The source workflow attaches <code>release.json</code> and both host archives. When the central importer is enabled and your plugin is enrolled, it verifies the release against its GitHub source and proposes a pull request for maintainer review.</li>
+        </ol>
+        <pre tabindex="0"><code>openstudio-si plugin configure-ci . \
+  --workflow-ref &quot;$REVIEWED_HARNESS_SHA&quot; --tooling-version 0.5.1</code></pre>
+        <p>Set <code>REVIEWED_HARNESS_SHA</code> to the full commit SHA that contains the reusable workflows. Your source repository uses its GitHub release permissions. Marketplace credentials remain with marketplace maintainers.</p>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
