@@ -1,0 +1,38 @@
+name: Validate marketplace
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  graph-and-hosts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install selected published tooling
+        env:
+          TOOLING_VERSION: ${{ vars.PLUGIN_TOOLING_VERSION }}
+        run: |
+          [[ "$TOOLING_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          python -m pip install --only-binary=:all: --index-url https://pypi.org/simple "openstudio-si[plugin-dev]==$TOOLING_VERSION"
+          openstudio-si plugin validate-marketplace --help
+      - name: Prepare pinned native host readers
+        run: |
+          npm install --ignore-scripts --prefix "$RUNNER_TEMP/hosts" @anthropic-ai/claude-code@2.1.309 @openai/codex@0.169.0-alpha.11.1
+          echo "$RUNNER_TEMP/hosts/node_modules/.bin" >> "$GITHUB_PATH"
+          openstudio-si plugin prepare-hosts "$RUNNER_TEMP/hosts" --output-dir "$RUNNER_TEMP/host-bin"
+          echo "$RUNNER_TEMP/host-bin" >> "$GITHUB_PATH"
+      - name: Check full graph, ownership, receipts and both native hosts
+        run: openstudio-si plugin validate-marketplace . --native-hosts
+      - name: Check trusted publication helpers
+        run: python -I -m unittest discover -s .github/scripts -p 'test_*.py'
